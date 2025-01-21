@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String        @id @default(ulid())
+  email       String        @unique
+  password    String
+  username    String
+  avatar      String?
+  bio         String?
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  Post        Post[]
+  Comment     Comment[]
+  PostLike    PostLike[]
+  CommentLike CommentLike[]
+  memberOf    Subreddit[]   @relation("SubredditMembers")
+  moderating  Subreddit[]   @relation("SubredditModerators")
+
+  @@unique([email, username])
+  @@index([username, email])
+  @@map("users")
+}
+
+model Post {
+  id          String     @id @default(ulid())
+  title       String
+  content     String
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+  authorId    String     @map("author_id")
+  author      User       @relation(fields: [authorId], references: [id])
+  Comment     Comment[]
+  PostLike    PostLike[]
+  Subreddit   Subreddit? @relation(fields: [subredditId], references: [id])
+  subredditId String?
+
+  @@map("posts")
+}
+
+model Subreddit {
+  id          String   @id @default(ulid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  Post        Post[]
+  members     User[]   @relation("SubredditMembers")
+  moderators  User[]   @relation("SubredditModerators")
+
+  @@map("subreddits")
+}
+
+model Comment {
+  id          String        @id @default(ulid())
+  content     String
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  authorId    String        @map("author_id")
+  author      User          @relation(fields: [authorId], references: [id])
+  postId      String        @map("post_id")
+  post        Post          @relation(fields: [postId], references: [id])
+  parentId    String?       @map("parent_id")
+  parent      Comment?      @relation("ChildComments", fields: [parentId], references: [id])
+  children    Comment[]     @relation("ChildComments")
+  CommentLike CommentLike[]
+
+  @@map("comments")
+}
+
+model PostLike {
+  id        String   @id @default(ulid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id])
+  postId    String   @map("post_id")
+  post      Post     @relation(fields: [postId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, postId])
+  @@map("post_likes")
+}
+
+model CommentLike {
+  id        String   @id @default(ulid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id])
+  commentId String   @map("comment_id")
+  comment   Comment  @relation(fields: [commentId], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, commentId])
+  @@map("comment_likes")
+}
