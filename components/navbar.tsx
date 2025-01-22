@@ -1,3 +1,4 @@
+import CreatePostDialog from "@/components/create-post-dialog";
 import {
   Avatar,
   Input,
@@ -7,11 +8,10 @@ import {
 } from "@heroui/react";
 import Link from "next/link";
 import { IoMdSearch } from "react-icons/io";
-import CreatePostDialog from "./create-post-dialog";
 
 const NavigationBar = () => {
   return (
-    <Navbar isBordered maxWidth="2xl">
+    <Navbar isBordered maxWidth="full">
       {/* Logo */}
       <NavbarBrand>
         <Link href="/" className="font-bold text-2xl text-orange-500">
@@ -23,7 +23,7 @@ const NavigationBar = () => {
       <NavbarContent justify="center" className="flex-grow">
         <Input
           classNames={{
-            base: "max-w-xl h-10",
+            base: "max-w-2xl h-10",
             mainWrapper: "h-full",
             input: "text-small",
             inputWrapper: "h-full font-normal text-default-500 bg-default-100",

@@ -4,13 +4,11 @@ import { Button, Textarea } from "@heroui/react";
 import React, { useState } from "react";
 
 type CommentBoxProps = {
-  onSubmit: (content: string) => void;
   placeholder?: string;
   buttonText?: string;
 };
 
 function CommentBox({
-  onSubmit,
   placeholder = "What are your thoughts?",
   buttonText = "Comment",
 }: CommentBoxProps) {
@@ -19,8 +17,6 @@ function CommentBox({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!content.trim()) return;
-
-    onSubmit(content);
     setContent("");
   };
 
@@ -31,11 +27,12 @@ function CommentBox({
         value={content}
         onChange={(e) => setContent(e.target.value)}
         minRows={4}
+        variant="bordered"
         classNames={{
-          input: "resize-y",
+          input: "resize-none",
         }}
       />
-      <div className="flex justify-end">
+      <div className="flex justify-start">
         <Button color="primary" type="submit" isDisabled={!content.trim()}>
           {buttonText}
         </Button>

@@ -16,10 +16,10 @@ model User {
   bio         String?
   createdAt   DateTime      @default(now()) @map("created_at")
   updatedAt   DateTime      @updatedAt @map("updated_at")
-  Post        Post[]
-  Comment     Comment[]
-  PostLike    PostLike[]
-  CommentLike CommentLike[]
+  post        Post[]
+  comment     Comment[]
+  postLike    PostLike[]
+  commentLike CommentLike[]
   memberOf    Subreddit[]   @relation("SubredditMembers")
   moderating  Subreddit[]   @relation("SubredditModerators")
 
@@ -36,9 +36,9 @@ model Post {
   updatedAt   DateTime   @updatedAt @map("updated_at")
   authorId    String     @map("author_id")
   author      User       @relation(fields: [authorId], references: [id])
-  Comment     Comment[]
-  PostLike    PostLike[]
-  Subreddit   Subreddit? @relation(fields: [subredditId], references: [id])
+  comment     Comment[]
+  postLike    PostLike[]
+  subreddit   Subreddit? @relation(fields: [subredditId], references: [id])
   subredditId String?
 
   @@map("posts")
@@ -50,7 +50,7 @@ model Subreddit {
   description String?
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
-  Post        Post[]
+  post        Post[]
   members     User[]   @relation("SubredditMembers")
   moderators  User[]   @relation("SubredditModerators")
 
@@ -69,7 +69,7 @@ model Comment {
   parentId    String?       @map("parent_id")
   parent      Comment?      @relation("ChildComments", fields: [parentId], references: [id])
   children    Comment[]     @relation("ChildComments")
-  CommentLike CommentLike[]
+  commentLike CommentLike[]
 
   @@map("comments")
 }

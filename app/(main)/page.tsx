@@ -19,6 +19,7 @@ const DUMMY_POSTS = [
       PostLike: 142,
       Comment: 47,
     },
+    userVote: 1,
   },
   {
     id: "2",
@@ -38,6 +39,7 @@ const DUMMY_POSTS = [
       PostLike: 2547,
       Comment: 231,
     },
+    userVote: -1,
   },
   {
     id: "3",
@@ -56,6 +58,7 @@ const DUMMY_POSTS = [
       PostLike: 943,
       Comment: 1205,
     },
+    userVote: null,
   },
   {
     id: "4",
@@ -75,6 +78,7 @@ const DUMMY_POSTS = [
       PostLike: 8432,
       Comment: 325,
     },
+    userVote: 1,
   },
   {
     id: "5",
@@ -93,6 +97,7 @@ const DUMMY_POSTS = [
       PostLike: 567,
       Comment: 89,
     },
+    userVote: -1,
   },
   {
     id: "6",
@@ -111,6 +116,7 @@ const DUMMY_POSTS = [
       PostLike: 2341,
       Comment: 89,
     },
+    userVote: null,
   },
   {
     id: "7",
@@ -129,6 +135,7 @@ const DUMMY_POSTS = [
       PostLike: 1543,
       Comment: 45,
     },
+    userVote: 1,
   },
 ];
 

@@ -4,11 +4,12 @@ import { Avatar, Button, Textarea } from "@heroui/react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useState } from "react";
-import { BiDownvote, BiEdit, BiReply, BiTrash, BiUpvote } from "react-icons/bi";
+import { BiEdit, BiReply, BiTrash } from "react-icons/bi";
+import VoteButtons from "./vote-buttons";
 
 dayjs.extend(relativeTime);
 
-type Comment = {
+export type Comment = {
   id: string;
   content: string;
   createdAt: Date;
@@ -19,6 +20,7 @@ type Comment = {
   _count: {
     CommentLike: number;
   };
+  userVote?: 1 | -1 | null;
   children: Comment[];
 };
 
@@ -54,19 +56,6 @@ function CommentComponent({ comment, level = 0 }: CommentProps) {
   return (
     <div className="mb-4">
       <div className={`flex gap-4 ${level > 0 ? "ml-8" : ""}`}>
-        {/* Vote buttons */}
-        <div className="flex flex-col items-center">
-          <Button isIconOnly variant="light" size="sm">
-            <BiUpvote className="w-4 h-4" />
-          </Button>
-          <span className="text-sm font-medium">
-            {comment._count.CommentLike}
-          </span>
-          <Button isIconOnly variant="light" size="sm">
-            <BiDownvote className="w-4 h-4" />
-          </Button>
-        </div>
-
         {/* Comment content */}
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
@@ -107,6 +96,11 @@ function CommentComponent({ comment, level = 0 }: CommentProps) {
 
           {/* Action buttons */}
           <div className="flex gap-2">
+            <VoteButtons
+              count={comment._count.CommentLike}
+              userVote={comment.userVote as 1 | -1 | null}
+              size="sm"
+            />
             <Button
               size="sm"
               variant="light"
