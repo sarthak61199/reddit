@@ -124,6 +124,7 @@ function CreatePostDialog() {
               selectedKeys={selectedSubreddit}
               onSelectionChange={setSelectedSubreddit}
               className="w-full"
+              isRequired
             >
               {SUBREDDITS.map((subreddit) => (
                 <SelectItem key={subreddit.key} textValue={subreddit.key}>
@@ -136,6 +137,7 @@ function CreatePostDialog() {
               label="Title"
               placeholder="Give your post a title"
               value={title}
+              isRequired
               onChange={(e) => setTitle(e.target.value)}
             />
 

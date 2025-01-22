@@ -1,11 +1,6 @@
+import AccountDropdown from "@/components/account-dropdown";
 import CreatePostDialog from "@/components/create-post-dialog";
-import {
-  Avatar,
-  Input,
-  Navbar,
-  NavbarBrand,
-  NavbarContent,
-} from "@heroui/react";
+import { Input, Navbar, NavbarBrand, NavbarContent } from "@heroui/react";
 import Link from "next/link";
 import { IoMdSearch } from "react-icons/io";
 
@@ -38,11 +33,7 @@ const NavigationBar = () => {
       {/* Right Side */}
       <NavbarContent justify="end" className="gap-4">
         <CreatePostDialog />
-        <Avatar
-          size="sm"
-          showFallback
-          src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde"
-        />
+        <AccountDropdown />
       </NavbarContent>
     </Navbar>
   );

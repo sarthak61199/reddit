@@ -1,7 +1,14 @@
 import SignUp from "@/components/sign-up";
-import React from "react";
+import { getSession } from "@/lib/session";
+import { redirect } from "next/navigation";
 
-function Page() {
+async function Page() {
+  const session = await getSession();
+
+  if (session) {
+    redirect("/");
+  }
+
   return <SignUp />;
 }
 

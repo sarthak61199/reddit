@@ -1,4 +1,6 @@
 import PostList from "@/components/post-list";
+import { getSession } from "@/lib/session";
+import { redirect } from "next/navigation";
 
 const DUMMY_POSTS = [
   {
@@ -139,10 +141,19 @@ const DUMMY_POSTS = [
   },
 ];
 
-function Page() {
+async function Page() {
+  const session = await getSession();
+
+  if (!session) {
+    redirect("/sign-in");
+  }
+
   return (
-    <div className="container mx-auto py-4">
-      <PostList posts={DUMMY_POSTS} />
+    <div className="container mx-auto py-4 flex gap-4 justify-center">
+      <div className="flex-1 max-w-2xl">
+        <PostList posts={DUMMY_POSTS} />
+      </div>
+      <div className="w-80" />
     </div>
   );
 }

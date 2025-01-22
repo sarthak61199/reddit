@@ -48,7 +48,7 @@ function PostCard({
   userVote,
 }: PostCardProps) {
   return (
-    <Card className="mb-4 hover:bg-default-100 transition-colors">
+    <Card className="mb-4 hover:bg-default-100 transition-colors p-2">
       <div className="flex-1">
         <CardHeader className="pb-2">
           <div className="flex items-center gap-2 text-sm">
