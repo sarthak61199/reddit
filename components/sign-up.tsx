@@ -1,6 +1,6 @@
 "use client";
 
-import { signUp } from "@/actions/mutations/auth";
+import { signUp } from "@/actions/auth";
 import { signUpSchema } from "@/schema/auth";
 import {
   Button,

@@ -1,10 +1,13 @@
+import { getSubreddits } from "@/actions/subreddit";
 import AccountDropdown from "@/components/account-dropdown";
 import CreatePostDialog from "@/components/create-post-dialog";
 import { Input, Navbar, NavbarBrand, NavbarContent } from "@heroui/react";
 import Link from "next/link";
 import { IoMdSearch } from "react-icons/io";
 
-const NavigationBar = () => {
+const NavigationBar = async () => {
+  const { subreddits } = await getSubreddits();
+
   return (
     <Navbar isBordered maxWidth="full">
       {/* Logo */}
@@ -32,7 +35,7 @@ const NavigationBar = () => {
 
       {/* Right Side */}
       <NavbarContent justify="end" className="gap-4">
-        <CreatePostDialog />
+        <CreatePostDialog subreddits={subreddits} />
         <AccountDropdown />
       </NavbarContent>
     </Navbar>

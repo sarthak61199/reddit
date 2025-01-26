@@ -15,30 +15,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { BiComment } from "react-icons/bi";
 import SubredditSidebar from "@/components/subreddit-sidebar";
+import { getPostById } from "@/actions/post";
 
 dayjs.extend(relativeTime);
-
-// For now using dummy data - later we'll fetch from API
-const post = {
-  id: "1",
-  title: "Just built my first mechanical keyboard!",
-  content:
-    "After months of research and collecting parts, I finally built my first custom mechanical keyboard. It's a 65% layout with Gateron Brown switches and PBT keycaps. The typing experience is amazing!",
-  image: "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef",
-  author: {
-    username: "keeb_enthusiast",
-  },
-  subreddit: {
-    name: "MechanicalKeyboards",
-    image: "https://images.unsplash.com/photo-1595225476474-87563907a212",
-  },
-  createdAt: new Date("2024-03-10T15:30:00"),
-  _count: {
-    PostLike: 142,
-    Comment: 47,
-  },
-  userVote: 1,
-};
 
 const DUMMY_COMMENTS: Comment[] = [
   {
@@ -85,7 +64,16 @@ const DUMMY_COMMENTS: Comment[] = [
   },
 ];
 
-function Page() {
+async function Page({
+  params,
+}: {
+  params: Promise<{ subreddit: string; postId: string }>;
+}) {
+  const subreddit = (await params).subreddit;
+  const postId = (await params).postId;
+
+  const { post } = await getPostById(postId);
+
   return (
     <div className="container mx-auto py-4 flex gap-4 justify-center">
       <div className="flex-1 max-w-2xl">
@@ -99,11 +87,11 @@ function Page() {
             <CardHeader className="pb-2">
               <div className="flex items-center gap-2 text-sm">
                 <Link
-                  href={`/r/${post.subreddit.name}`}
+                  href={`/r/${post.subreddit?.name}`}
                   className="flex items-center gap-2 font-medium hover:underline"
                 >
                   <Avatar
-                    src={post.subreddit.image ?? `/subreddit-fallback.png`}
+                    src={post.subreddit?.image ?? `/subreddit-fallback.png`}
                     size="sm"
                     radius="sm"
                     showFallback
@@ -113,7 +101,7 @@ function Page() {
                       </div>
                     }
                   />
-                  r/{post.subreddit.name}
+                  r/{post.subreddit?.name}
                 </Link>
                 <span className="text-default-500">•</span>
                 <div className="flex items-center gap-2 text-default-500">
@@ -152,15 +140,16 @@ function Page() {
 
             <CardFooter className="gap-2">
               <VoteButtons
-                count={post._count.PostLike}
-                userVote={post.userVote as 1 | -1 | null}
+                count={post.likeCount}
+                hasLiked={post.hasLiked}
+                hasUnLiked={post.hasUnLiked}
                 size="md"
               />
               <Button
                 variant="light"
                 startContent={<BiComment className="w-5 h-5" />}
               >
-                {post._count.Comment} Comments
+                {post.commentCount} Comments
               </Button>
             </CardFooter>
           </div>
@@ -178,7 +167,7 @@ function Page() {
           </CardBody>
         </Card>
       </div>
-      <SubredditSidebar />
+      <SubredditSidebar subredditName={subreddit} />
     </div>
   );
 }

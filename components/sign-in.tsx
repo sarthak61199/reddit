@@ -13,7 +13,7 @@ import {
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "@/actions/mutations/auth";
+import { signIn } from "@/actions/auth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 

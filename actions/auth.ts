@@ -11,7 +11,7 @@ export async function signIn(data: z.infer<typeof signInSchema>) {
   const result = signInSchema.safeParse(data);
 
   if (!result.success) {
-    return { error: "Invalid inputs" };
+    throw new Error("Invalid inputs");
   }
 
   const { emailOrUsername, password } = result.data;

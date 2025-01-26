@@ -1,7 +1,10 @@
 "use client";
 
-import { createPost } from "@/actions/post";
-import { CreatePostInput } from "@/schema/post";
+import { createSubreddit } from "@/actions/subreddit";
+import {
+  CreateSubredditInput,
+  createSubredditSchema,
+} from "@/schema/subreddit";
 import {
   Button,
   Input,
@@ -10,47 +13,40 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
-  Select,
-  SelectItem,
   Textarea,
 } from "@heroui/react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Controller, useForm } from "react-hook-form";
 import { BiImage, BiX } from "react-icons/bi";
+import { GoPlus } from "react-icons/go";
 import { toast } from "sonner";
 
-function CreatePostDialog({
-  subreddits,
-}: {
-  subreddits: { name: string; id: string; image: string | null }[];
-}) {
-  const [isCreatePostOpen, setIsCreatePostOpen] = useState(false);
+function CreateSubredditDialog() {
+  const [isCreateSubredditOpen, setIsCreateSubredditOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
-  const { subreddit } = useParams<{ subreddit: string }>();
 
   const { push } = useRouter();
 
-  const { control, handleSubmit, reset, setValue } = useForm<CreatePostInput>({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<CreateSubredditInput>({
     defaultValues: {
-      title: "",
-      content: "",
-      subredditId: new Set([]),
+      name: "",
+      description: "",
       image: undefined,
     },
+    resolver: zodResolver(createSubredditSchema),
   });
 
-  useEffect(() => {
-    if (subreddit) {
-      setValue("subredditId", new Set([subreddit]));
-    }
-  }, [subreddit]);
-
   const onClose = () => {
-    setIsCreatePostOpen(false);
+    setIsCreateSubredditOpen(false);
     setPreviewUrl(null);
     reset();
   };
@@ -74,11 +70,11 @@ function CreatePostDialog({
     maxFiles: 1,
   });
 
-  const onSubmit = async (data: CreatePostInput) => {
+  const onSubmit = async (data: CreateSubredditInput) => {
     try {
-      const { postId, subredditName } = await createPost(data);
-      toast.success("Post created successfully");
-      push(`r/${subredditName}/post/${postId}`);
+      const result = await createSubreddit(data);
+      toast.success("Subreddit created successfully");
+      push(`/r/${result.name}`);
       onClose();
     } catch (e) {
       if (e instanceof Error) {
@@ -91,67 +87,51 @@ function CreatePostDialog({
 
   const removeImage = (onChange: (value: null) => void) => {
     onChange(null);
+    setPreviewUrl(null);
   };
 
   return (
     <>
       <Button
-        onPress={() => setIsCreatePostOpen(true)}
-        color="primary"
+        onPress={() => setIsCreateSubredditOpen(true)}
+        color="default"
+        variant="light"
         radius="full"
         className="hidden sm:flex"
+        startContent={<GoPlus size={32} />}
       >
-        Create Post
+        Create Community
       </Button>
-      <Modal isOpen={isCreatePostOpen} onClose={onClose} size="2xl">
+      <Modal isOpen={isCreateSubredditOpen} onClose={onClose} size="2xl">
         <ModalContent>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <ModalHeader>Create a Post</ModalHeader>
+            <ModalHeader>Create a Community</ModalHeader>
             <ModalBody className="space-y-4">
               <Controller
                 control={control}
-                name="subredditId"
-                render={({ field }) => (
-                  <Select
-                    label="Choose a community"
-                    selectedKeys={field.value}
-                    onSelectionChange={field.onChange}
-                    className="w-full"
-                    isRequired
-                  >
-                    {subreddits.map((subreddit) => (
-                      <SelectItem
-                        key={subreddit.name}
-                        textValue={subreddit.name}
-                      >
-                        r/{subreddit.name}
-                      </SelectItem>
-                    ))}
-                  </Select>
-                )}
-              />
-              <Controller
-                control={control}
-                name="title"
+                name="name"
                 render={({ field }) => (
                   <Input
-                    label="Title"
-                    placeholder="Give your post a title"
+                    label="Name"
+                    placeholder="Subreddit Name"
                     value={field.value}
                     isRequired
                     onChange={field.onChange}
+                    description="Community names including capitalization cannot be changed"
+                    isInvalid={!!errors.name?.message}
+                    errorMessage={errors.name?.message}
                   />
                 )}
               />
 
               <Controller
                 control={control}
-                name="content"
+                name="description"
                 render={({ field }) => (
                   <Textarea
-                    label="Content"
-                    placeholder="What's on your mind?"
-                    value={field.value}
+                    label="Description"
+                    placeholder="What is your community about?"
+                    value={field.value || ""}
                     onChange={field.onChange}
                     minRows={3}
                   />
@@ -188,19 +168,19 @@ function CreatePostDialog({
                         <BiImage className="w-12 h-12 mx-auto mb-4 text-default-400" />
                         <p className="text-default-600">
                           {isDragActive
-                            ? "Drop the image here"
-                            : "Drag and drop an image, or click to select"}
+                            ? "Drop the community icon here"
+                            : "Drag and drop a community icon, or click to select"}
                         </p>
                       </div>
                     ) : (
                       <div className="relative">
-                        <div className="relative aspect-video rounded-lg overflow-hidden bg-default-100">
+                        <div className="relative w-32 h-32 rounded-full overflow-hidden bg-default-100 mx-auto">
                           {previewUrl && (
                             <Image
                               src={previewUrl}
                               alt="Preview"
                               fill
-                              className="object-contain"
+                              className="object-cover"
                             />
                           )}
                         </div>
@@ -209,7 +189,7 @@ function CreatePostDialog({
                           size="sm"
                           color="danger"
                           variant="flat"
-                          className="absolute top-2 right-2"
+                          className="absolute top-0 right-0"
                           onPress={() => removeImage(onChange)}
                         >
                           <BiX />
@@ -225,7 +205,7 @@ function CreatePostDialog({
                 Cancel
               </Button>
               <Button color="primary" type="submit">
-                Post
+                Create Community
               </Button>
             </ModalFooter>
           </form>
@@ -235,4 +215,4 @@ function CreatePostDialog({
   );
 }
 
-export default CreatePostDialog;
+export default CreateSubredditDialog;

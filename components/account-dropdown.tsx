@@ -1,6 +1,6 @@
 "use client";
 
-import { signOut } from "@/actions/mutations/auth";
+import { signOut } from "@/actions/auth";
 import {
   Avatar,
   Dropdown,

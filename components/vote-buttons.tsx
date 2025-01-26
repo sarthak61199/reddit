@@ -1,20 +1,23 @@
 "use client";
 
+import { cn } from "@/lib/cn";
 import { Button } from "@heroui/react";
-import { BiUpvote, BiDownvote } from "react-icons/bi";
+import { BiDownvote, BiUpvote } from "react-icons/bi";
 
 type VoteButtonsProps = {
   count: number;
-  userVote?: 1 | -1 | null;
   size?: "sm" | "md" | "lg";
+  hasLiked?: boolean;
+  hasUnLiked?: boolean;
   onUpvote?: () => void;
   onDownvote?: () => void;
 };
 
 function VoteButtons({
   count,
-  userVote = null,
   size = "sm",
+  hasLiked = false,
+  hasUnLiked = false,
   onUpvote,
   onDownvote,
 }: VoteButtonsProps) {
@@ -36,7 +39,7 @@ function VoteButtons({
         isIconOnly
         variant="light"
         size={size}
-        className={userVote === 1 ? "text-primary" : ""}
+        className={cn(hasLiked && "text-primary")}
         onPress={onUpvote}
       >
         <BiUpvote className={iconSize} />
@@ -46,7 +49,7 @@ function VoteButtons({
         isIconOnly
         variant="light"
         size={size}
-        className={userVote === -1 ? "text-danger" : ""}
+        className={cn(hasUnLiked && "text-danger")}
         onPress={onDownvote}
       >
         <BiDownvote className={iconSize} />
