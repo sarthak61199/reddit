@@ -1,5 +1,5 @@
-import PostList from "@/components/post-list";
-import { getSession } from "@/lib/session";
+import { getSession } from "@/features/auth/session";
+import PostList from "@/features/posts/components/post-list";
 import { redirect } from "next/navigation";
 
 const DUMMY_POSTS = [

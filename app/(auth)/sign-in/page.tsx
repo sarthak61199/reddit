@@ -1,5 +1,5 @@
-import SignIn from "@/components/sign-in";
-import { getSession } from "@/lib/session";
+import SignIn from "@/features/auth/components/sign-in";
+import { getSession } from "@/features/auth/session";
 import { redirect } from "next/navigation";
 
 async function Page() {

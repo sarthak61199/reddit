@@ -1,68 +1,40 @@
 "use client";
 
-import { signOut } from "@/actions/auth";
+import { signOut } from "@/features/auth/action";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import {
-  Avatar,
-  Dropdown,
-  DropdownItem,
   DropdownMenu,
-  DropdownTrigger,
-} from "@heroui/react";
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { LogOut, User } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { BiLogOut, BiUser } from "react-icons/bi";
-import { toast } from "sonner";
 
 function AccountDropdown() {
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    try {
-      const res = await signOut();
-
-      if (res.success) {
-        router.replace("/sign-in");
-        toast.success(res.message);
-      }
-    } catch (e) {
-      if (e instanceof Error) {
-        toast.error(e.message);
-      } else {
-        toast.error("Something went wrong");
-      }
-    }
-  };
-
   return (
-    <Dropdown placement="bottom-end">
-      <DropdownTrigger>
-        <Avatar
-          size="sm"
-          showFallback
-          src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde"
-          className="cursor-pointer"
-        />
-      </DropdownTrigger>
-      <DropdownMenu aria-label="Profile actions">
-        <DropdownItem
-          key="profile"
-          startContent={<BiUser className="text-xl" />}
-          href="/account"
-          as={Link}
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Avatar>
+          <AvatarImage src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde" />
+        </Avatar>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem className="cursor-pointer">
+          <Link href="/account" className="flex items-center gap-2">
+            <User className="size-5" />
+            Profile
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={signOut}
+          className="text-red-500 cursor-pointer flex items-center gap-2"
         >
-          Profile
-        </DropdownItem>
-        <DropdownItem
-          key="logout"
-          className="text-danger"
-          color="danger"
-          startContent={<BiLogOut className="text-xl" />}
-          onPress={handleLogout}
-        >
+          <LogOut className="size-5" />
           Log Out
-        </DropdownItem>
-      </DropdownMenu>
-    </Dropdown>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 

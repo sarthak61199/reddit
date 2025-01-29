@@ -1,6 +1,6 @@
-import { getSubredditPosts } from "@/actions/post";
-import PostList from "@/components/post-list";
-import SubredditSidebar from "@/components/subreddit-sidebar";
+import PostList from "@/features/posts/components/post-list";
+import { getSubredditPosts } from "@/features/posts/query";
+import SubredditSidebar from "@/features/subreddits/components/subreddit-sidebar";
 
 async function Page({ params }: { params: Promise<{ subreddit: string }> }) {
   const subreddit = (await params).subreddit;

@@ -8,98 +8,94 @@ datasource db {
 }
 
 model User {
-  id          String        @id @default(ulid())
-  email       String        @unique
-  password    String
-  username    String        @unique
-  avatar      String?
-  bio         String?
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
-  post        Post[]
-  comment     Comment[]
-  postLike    PostLike[]
-  commentLike CommentLike[]
-  memberOf    Subreddit[]   @relation("SubredditMembers")
-  moderating  Subreddit[]   @relation("SubredditModerators")
+  id       String  @id @default(ulid())
+  email    String  @unique
+  password String
+  username String  @unique
+  avatar   String?
+  bio      String?
+
+  post       Post[]
+  comment    Comment[]
+  postLike   PostLike[]
+  memberOf   Subreddit[] @relation("SubredditMembers")
+  moderating Subreddit[] @relation("SubredditModerators")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@index([username, email])
   @@map("users")
 }
 
 model Post {
-  id            String     @id @default(ulid())
+  id            String  @id @default(ulid())
   title         String
   content       String?
   image         String?
-  createdAt     DateTime   @default(now()) @map("created_at")
-  updatedAt     DateTime   @updatedAt @map("updated_at")
-  authorId      String     @map("author_id")
-  author        User       @relation(fields: [authorId], references: [id])
-  comment       Comment[]
-  postLike      PostLike[]
-  subreddit     Subreddit  @relation(fields: [subredditName], references: [name])
-  subredditName String     @map("subreddit_id")
+  authorId      String  @map("author_id")
+  subredditName String  @map("subreddit_name")
+
+  author    User       @relation(fields: [authorId], references: [id])
+  comment   Comment[]
+  postLike  PostLike[]
+  subreddit Subreddit  @relation(fields: [subredditName], references: [name])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("posts")
 }
 
 model Subreddit {
-  name        String   @id @unique
+  name        String  @id
   description String?
   image       String?
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  post        Post[]
-  members     User[]   @relation("SubredditMembers")
-  moderators  User[]   @relation("SubredditModerators")
+  likeCount   Int     @default(1)
+
+  post       Post[]
+  members    User[] @relation("SubredditMembers")
+  moderators User[] @relation("SubredditModerators")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("subreddits")
 }
 
 model Comment {
-  id          String        @id @default(ulid())
-  content     String
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
-  authorId    String        @map("author_id")
-  author      User          @relation(fields: [authorId], references: [id])
-  postId      String        @map("post_id")
-  post        Post          @relation(fields: [postId], references: [id])
-  parentId    String?       @map("parent_id")
-  parent      Comment?      @relation("ChildComments", fields: [parentId], references: [id])
-  children    Comment[]     @relation("ChildComments")
-  commentLike CommentLike[]
+  id         String  @id @default(ulid())
+  content    String
+  likeCount  Int     @default(1)
+  userAction ACTION?
+  authorId   String  @map("author_id")
+  postId     String  @map("post_id")
+  parentId   String? @map("parent_id")
+
+  author   User      @relation(fields: [authorId], references: [id])
+  post     Post      @relation(fields: [postId], references: [id])
+  parent   Comment?  @relation("ChildComments", fields: [parentId], references: [id])
+  children Comment[] @relation("ChildComments")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("comments")
 }
 
 model PostLike {
-  userId    String   @map("user_id")
-  user      User     @relation(fields: [userId], references: [id])
-  postId    String   @map("post_id")
-  post      Post     @relation(fields: [postId], references: [id])
-  action    ACTION
+  userId String @map("user_id")
+  postId String @map("post_id")
+  action ACTION
+
+  user User @relation(fields: [userId], references: [id])
+  post Post @relation(fields: [postId], references: [id])
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@id([userId, postId])
-  @@unique([userId, postId])
   @@map("post_likes")
-}
-
-model CommentLike {
-  userId    String   @map("user_id")
-  user      User     @relation(fields: [userId], references: [id])
-  commentId String   @map("comment_id")
-  comment   Comment  @relation(fields: [commentId], references: [id])
-  action    ACTION
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@id([userId, commentId])
-  @@unique([userId, commentId])
-  @@map("comment_likes")
 }
 
 enum ACTION {
