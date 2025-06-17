@@ -1,13 +1,7 @@
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import UserDropdown from "@/components/user-dropdown";
+import Image from "next/image";
 
 function Navbar() {
   return (
@@ -18,19 +12,13 @@ function Navbar() {
           orientation="vertical"
           className="mr-2 data-[orientation=vertical]:h-4"
         />
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem className="hidden md:block">
-              <BreadcrumbLink href="#">
-                Building Your Application
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator className="hidden md:block" />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-2">
+            <Image src="/logo.svg" alt="logo" width={32} height={32} />
+            <h1 className="text-2xl font-bold">Reddit.</h1>
+          </div>
+          <UserDropdown />
+        </div>
       </div>
     </header>
   );
