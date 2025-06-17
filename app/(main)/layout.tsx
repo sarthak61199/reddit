@@ -5,13 +5,15 @@ import { ReactNode } from "react";
 
 function Layout({ children }: { children: ReactNode }) {
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
+    <div className="[--header-height:calc(--spacing(14))]">
+      <SidebarProvider className="flex flex-col">
         <Navbar />
-        {children}
-      </SidebarInset>
-    </SidebarProvider>
+        <div className="flex flex-1">
+          <AppSidebar />
+          <SidebarInset>{children}</SidebarInset>
+        </div>
+      </SidebarProvider>
+    </div>
   );
 }
 
