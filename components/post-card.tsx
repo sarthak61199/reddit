@@ -29,7 +29,7 @@ function PostCard({
   isPostPage?: boolean;
 }) {
   return (
-    <Card className="border-border bg-card gap-0">
+    <Card className="border-border bg-card gap-0 w-full">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Link
@@ -57,14 +57,14 @@ function PostCard({
       <CardContent className="pt-0">
         <div className="space-y-3">
           <h2 className="text-lg font-semibold leading-tight text-foreground">
-            <Link href={`/r/sarthak/post/${id}`}>{title}</Link>
+            <Link href={`/r/${subreddit.name}/post/${id}`}>{title}</Link>
           </h2>
 
-          {content && (
+          {content && (isPostPage || !imageUrl) && (
             <p
               className={cn(
                 "text-sm text-muted-foreground leading-relaxed",
-                !isPostPage && "truncate"
+                !isPostPage && "line-clamp-2"
               )}
             >
               {content}

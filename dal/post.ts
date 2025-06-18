@@ -2,6 +2,79 @@ import db from "@/lib/db";
 import { getUser } from "@/lib/get-user";
 import { notFound } from "next/navigation";
 
+export const getPosts = async (page: number = 1, limit: number = 10) => {
+  const user = await getUser();
+
+  const posts = await db.post.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+    skip: (page - 1) * limit,
+    take: limit,
+    select: {
+      id: true,
+      title: true,
+      content: true,
+      imageUrl: true,
+      createdAt: true,
+      voteCount: true,
+      subreddit: {
+        select: {
+          name: true,
+        },
+      },
+      user: {
+        select: {
+          username: true,
+          image: true,
+        },
+      },
+      _count: {
+        select: {
+          comments: true,
+        },
+      },
+    },
+  });
+
+  const postPromise = posts.map(async (post) => {
+    const userVote = await db.postVote.findUnique({
+      where: {
+        userId_postId: {
+          userId: user.id,
+          postId: post.id,
+        },
+      },
+      select: {
+        voteType: true,
+      },
+    });
+
+    return {
+      ...post,
+      userVote,
+    };
+  });
+
+  const postsWithUserVote = await Promise.all(postPromise);
+
+  return {
+    posts: postsWithUserVote.map((post) => ({
+      id: post.id,
+      title: post.title,
+      content: post.content,
+      imageUrl: post.imageUrl,
+      createdAt: post.createdAt,
+      subreddit: post.subreddit,
+      voteCount: post.voteCount,
+      user: post.user,
+      userVote: post.userVote?.voteType ?? null,
+      commentCount: post._count.comments,
+    })),
+    hasMore: postsWithUserVote.length === limit,
+  };
+};
+
 export const getPost = async (id: string) => {
   const user = await getUser();
 
@@ -23,7 +96,6 @@ export const getPost = async (id: string) => {
       },
       user: {
         select: {
-          id: true,
           username: true,
           image: true,
         },
@@ -59,9 +131,10 @@ export const getPost = async (id: string) => {
     subreddit: post.subreddit,
     voteCount: post.voteCount,
     user: post.user,
-    userVote: post.postVotes?.[0]?.voteType ?? null,
+    userVote: post.postVotes?.[0]?.voteType ? post.postVotes[0].voteType : null,
     commentCount: post._count.comments,
   };
 };
 
 export type GetPost = Awaited<ReturnType<typeof getPost>>;
+export type GetPosts = Awaited<ReturnType<typeof getPosts>>;
