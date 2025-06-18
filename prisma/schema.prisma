@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
   output   = "../lib/generated/prisma"
@@ -10,22 +9,28 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  name          String
-  email         String
-  emailVerified Boolean
-  image         String?
-  createdAt     DateTime
-  updatedAt     DateTime
-  sessions      Session[]
-  accounts      Account[]
-
-  username        String?
-  displayUsername String?
+  id                  String               @id @default(uuid())
+  name                String
+  email               String
+  emailVerified       Boolean
+  image               String?
+  createdAt           DateTime
+  updatedAt           DateTime
+  sessions            Session[]
+  accounts            Account[]
+  posts               Post[]
+  comments            Comment[]
+  subredditMembers    SubredditMember[]
+  subredditModerators SubredditModerator[]
+  postVotes           PostVote[]
+  commentVotes        CommentVote[]
+  username            String?
+  displayUsername     String?
 
   @@unique([email])
-  @@map("user")
   @@unique([username])
+  @@index([username])
+  @@map("user")
 }
 
 model Session {
@@ -71,4 +76,98 @@ model Verification {
   updatedAt  DateTime?
 
   @@map("verification")
+}
+
+model Subreddit {
+  name                String               @id
+  description         String?
+  imageUrl            String?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  posts               Post[]
+  subredditMembers    SubredditMember[]
+  subredditModerators SubredditModerator[]
+
+  @@map("subreddit")
+}
+
+model SubredditMember {
+  isFounder     Boolean   @default(false)
+  userId        String
+  subredditName String
+  user          User      @relation(fields: [userId], references: [id])
+  subreddit     Subreddit @relation(fields: [subredditName], references: [name])
+
+  @@id([userId, subredditName])
+  @@map("subreddit_member")
+}
+
+model SubredditModerator {
+  userId        String
+  subredditName String
+  user          User      @relation(fields: [userId], references: [id])
+  subreddit     Subreddit @relation(fields: [subredditName], references: [name])
+
+  @@id([userId, subredditName])
+  @@map("subreddit_moderator")
+}
+
+model Post {
+  id            String     @id @default(uuid())
+  title         String
+  content       String?
+  imageUrl      String?
+  voteCount     Int        @default(1)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  user          User       @relation(fields: [userId], references: [id])
+  userId        String
+  subreddit     Subreddit  @relation(fields: [subredditName], references: [name])
+  subredditName String
+  comments      Comment[]
+  postVotes     PostVote[]
+
+  @@map("post")
+}
+
+model PostVote {
+  userId   String
+  postId   String
+  voteType VoteType
+  user     User     @relation(fields: [userId], references: [id])
+  post     Post     @relation(fields: [postId], references: [id])
+
+  @@id([userId, postId])
+  @@map("post_vote")
+}
+
+model Comment {
+  id           String        @id @default(uuid())
+  content      String
+  voteCount    Int           @default(1)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  user         User          @relation(fields: [userId], references: [id])
+  userId       String
+  post         Post          @relation(fields: [postId], references: [id])
+  postId       String
+  commentVotes CommentVote[]
+
+  @@map("comment")
+}
+
+model CommentVote {
+  userId    String
+  commentId String
+  voteType  VoteType
+  user      User     @relation(fields: [userId], references: [id])
+  Comment   Comment  @relation(fields: [commentId], references: [id])
+
+  @@id([userId, commentId])
+  @@map("comment_vote")
+}
+
+enum VoteType {
+  UPVOTE
+  DOWNVOTE
 }
