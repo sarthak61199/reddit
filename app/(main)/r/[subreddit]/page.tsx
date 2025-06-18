@@ -4,11 +4,7 @@ import { getUser } from "@/lib/get-user";
 import { notFound } from "next/navigation";
 
 async function Page({ params }: { params: Promise<{ subreddit: string }> }) {
-  return (
-    <div>
-      <PostList />
-    </div>
-  );
+  return <div>{/* <PostList /> */}</div>;
 }
 
 export default Page;

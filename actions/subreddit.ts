@@ -26,6 +26,7 @@ export const createSubreddit = async (
     const subreddit = await db.subreddit.create({
       data: {
         ...v.data,
+        imageUrl: v.data.imageUrl || null,
         subredditMembers: { create: { userId: user.id } },
         subredditModerators: { create: { userId: user.id, isFounder: true } },
       },

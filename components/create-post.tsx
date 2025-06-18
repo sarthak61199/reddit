@@ -1,5 +1,6 @@
 "use client";
 
+import { createPost } from "@/actions/post";
 import ImageUploader from "@/components/image-uploader";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,24 +27,56 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { PLACEHOLDER_AVATAR_URL } from "@/constants";
+import { Subreddits } from "@/dal/subreddit";
+import { tryCatch } from "@/hooks/try-catch";
 import { useDisclosure } from "@/hooks/use-disclosure";
-import { Plus } from "lucide-react";
+import { createPostSchema, CreatePostSchema } from "@/schema/post";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Plus } from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { use, useTransition } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
-function CreatePost() {
-  const { isOpen, onOpen, onToggle } = useDisclosure();
+function CreatePost({
+  subredditsPromise,
+}: {
+  subredditsPromise: Promise<Subreddits>;
+}) {
+  const router = useRouter();
+  const { isOpen, onOpen, onToggle, onClose } = useDisclosure();
+  const [isPending, startTransition] = useTransition();
 
-  const form = useForm({
+  const subreddits = use(subredditsPromise);
+
+  const form = useForm<CreatePostSchema>({
     defaultValues: {
       title: "",
       content: "",
       subreddit: "",
       imageUrl: "",
     },
+    resolver: zodResolver(createPostSchema),
   });
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const onSubmit = async (data: CreatePostSchema) => {
+    startTransition(async () => {
+      const { error, response } = await tryCatch(createPost(data));
+
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+
+      if (response?.success) {
+        toast.success(response.message);
+        onClose();
+        form.reset();
+        router.push(`/r/${response.data?.subreddit}/post/${response.data?.id}`);
+      }
+    });
   };
 
   return (
@@ -73,20 +106,34 @@ function CreatePost() {
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a verified email to display" />
+                        <SelectTrigger className="h-auto ps-2 text-left [&>span]:flex [&>span]:items-center [&>span]:gap-2 [&>span_img]:shrink-0">
+                          <SelectValue placeholder="Select a subreddit" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
-                        <SelectItem value="m@example.com">
-                          m@example.com
-                        </SelectItem>
-                        <SelectItem value="m@google.com">
-                          m@google.com
-                        </SelectItem>
-                        <SelectItem value="m@support.com">
-                          m@support.com
-                        </SelectItem>
+                      <SelectContent className="[&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:end-2">
+                        {subreddits.map((subreddit) => (
+                          <SelectItem
+                            value={subreddit.name}
+                            key={subreddit.name}
+                          >
+                            <span className="flex items-center gap-2">
+                              <img
+                                className="rounded-full"
+                                src={
+                                  subreddit.imageUrl || PLACEHOLDER_AVATAR_URL
+                                }
+                                alt={subreddit.name}
+                                width={24}
+                                height={24}
+                              />
+                              <span>
+                                <span className="block font-medium">
+                                  r/{subreddit.name}
+                                </span>
+                              </span>
+                            </span>
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -135,8 +182,13 @@ function CreatePost() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" size="lg" className="w-full">
-                <Plus />
+              <Button
+                type="submit"
+                size="lg"
+                className="w-full"
+                disabled={isPending}
+              >
+                {isPending ? <Loader2 className="animate-spin" /> : <Plus />}
                 Create Post
               </Button>
             </form>

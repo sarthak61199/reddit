@@ -3,11 +3,14 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import UserDropdown from "@/components/user-dropdown";
+import { getSubreddits } from "@/dal/subreddit";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 
 function Navbar({ isAuthPage = false }: { isAuthPage?: boolean }) {
+  const subreddits = getSubreddits();
+
   return (
     <header className="bg-background sticky top-0 z-50 flex w-full items-center border-b">
       <div className="flex h-(--header-height) w-full items-center gap-2 px-4">
@@ -30,7 +33,7 @@ function Navbar({ isAuthPage = false }: { isAuthPage?: boolean }) {
           </Link>
           {!isAuthPage && (
             <div className="flex items-center gap-6">
-              <CreatePost />
+              <CreatePost subredditsPromise={subreddits} />
               <Suspense fallback={<Skeleton className="size-8 rounded-full" />}>
                 <UserDropdown />
               </Suspense>

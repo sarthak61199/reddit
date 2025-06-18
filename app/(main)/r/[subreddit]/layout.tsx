@@ -11,8 +11,8 @@ async function Layout({
   const { subreddit } = await params;
 
   return (
-    <div className="flex gap-4 items-start">
-      <div className="flex-1">{children}</div>
+    <div className="flex gap-4 max-w-7xl mx-auto">
+      {children}
       <SubredditSidebar subredditName={subreddit} />
     </div>
   );

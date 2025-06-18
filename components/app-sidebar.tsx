@@ -1,5 +1,5 @@
 import CreateSubreddit from "@/components/create-subreddit";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import {
   Sidebar,
   SidebarContent,
@@ -12,43 +12,8 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { PLACEHOLDER_AVATAR_URL } from "@/constants";
-import db from "@/lib/db";
-import { getUser } from "@/lib/get-user";
+import { getSubreddits } from "@/dal/subreddit";
 import Link from "next/link";
-
-const data = {
-  navMain: [
-    {
-      title: "Installation",
-      url: "#",
-    },
-    {
-      title: "Project Structure",
-      url: "#",
-    },
-  ],
-};
-
-const getSubreddits = async () => {
-  const user = await getUser();
-
-  const subreddits = await db.subreddit.findMany({
-    orderBy: {
-      name: "asc",
-    },
-    where: {
-      subredditMembers: {
-        some: { userId: user.id },
-      },
-    },
-    select: {
-      name: true,
-      imageUrl: true,
-    },
-  });
-
-  return subreddits;
-};
 
 export async function AppSidebar({
   ...props
