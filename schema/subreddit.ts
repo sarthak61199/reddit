@@ -6,4 +6,9 @@ export const createSubredditSchema = z.object({
   imageUrl: z.string(),
 });
 
+export const addModeratorSchema = z.object({
+  username: z.string().min(3).max(21).trim(),
+});
+
 export type CreateSubredditSchema = z.infer<typeof createSubredditSchema>;
+export type AddModeratorSchema = z.infer<typeof addModeratorSchema>;

@@ -1,5 +1,7 @@
 import CommentBox from "@/components/comment-box";
+import CommentList from "@/components/comment-list";
 import PostCard from "@/components/post-card";
+import { Separator } from "@/components/ui/separator";
 import { getPost } from "@/dal/post";
 
 async function Page({ params }: { params: Promise<{ postId: string }> }) {
@@ -11,6 +13,8 @@ async function Page({ params }: { params: Promise<{ postId: string }> }) {
     <div className="flex flex-col gap-4 justify-center max-w-2xl mx-auto">
       <PostCard post={post} isPostPage />
       <CommentBox />
+      <Separator />
+      <CommentList />
     </div>
   );
 }

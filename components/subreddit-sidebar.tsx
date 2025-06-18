@@ -2,61 +2,9 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { PLACEHOLDER_AVATAR_URL } from "@/constants";
-import db from "@/lib/db";
-import { getUser } from "@/lib/get-user";
+import { getSubreddit } from "@/dal/subreddit";
 import { Crown, Users } from "lucide-react";
-import { notFound } from "next/navigation";
-
-const getSubreddit = async (name: string) => {
-  const user = await getUser();
-
-  const subreddit = await db.subreddit.findUnique({
-    where: { name },
-    select: {
-      _count: {
-        select: {
-          subredditMembers: true,
-        },
-      },
-      imageUrl: true,
-      description: true,
-      name: true,
-      subredditModerators: {
-        select: {
-          isFounder: true,
-          user: {
-            select: {
-              username: true,
-              image: true,
-            },
-          },
-        },
-      },
-    },
-  });
-
-  if (!subreddit) {
-    notFound();
-  }
-
-  const isMember = await db.subredditMember.findUnique({
-    where: {
-      userId_subredditName: {
-        userId: user.id,
-        subredditName: name,
-      },
-    },
-  });
-
-  return {
-    isMember: !!isMember,
-    name: subreddit.name,
-    description: subreddit.description,
-    imageUrl: subreddit.imageUrl,
-    moderators: subreddit.subredditModerators,
-    memberCount: subreddit._count?.subredditMembers,
-  };
-};
+import AddModerator from "./add-moderator";
 
 async function SubredditSidebar({ subredditName }: { subredditName: string }) {
   const subreddit = await getSubreddit(subredditName);
@@ -130,10 +78,13 @@ async function SubredditSidebar({ subredditName }: { subredditName: string }) {
 
         {/* Moderators Section */}
         <div>
-          <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-            <Crown className="size-4 text-primary" />
-            Moderators
-          </h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <Crown className="size-4 text-primary" />
+              Moderators
+            </h3>
+            {subreddit.isModerator && <AddModerator />}
+          </div>
           <div className="space-y-2">
             {subreddit.moderators.map((moderator) => (
               <div

@@ -3,6 +3,8 @@
 import db from "@/lib/db";
 import { getUser } from "@/lib/get-user";
 import {
+  addModeratorSchema,
+  AddModeratorSchema,
   createSubredditSchema,
   CreateSubredditSchema,
 } from "@/schema/subreddit";
@@ -44,6 +46,99 @@ export const createSubreddit = async (
     console.log(e);
     return {
       message: "Failed to create subreddit",
+      success: false,
+    };
+  }
+};
+
+export const addModerator = async (
+  input: AddModeratorSchema,
+  subredditName: string
+): Promise<Response> => {
+  const user = await getUser();
+
+  const v = addModeratorSchema.safeParse(input);
+
+  if (!v.success) {
+    return {
+      message: "Invalid input",
+      success: false,
+    };
+  }
+
+  try {
+    const subreddit = await db.subreddit.findUnique({
+      where: {
+        name: subredditName,
+      },
+    });
+
+    if (!subreddit) {
+      return {
+        message: "Subreddit not found",
+        success: false,
+      };
+    }
+
+    const isModerator = await db.subredditModerator.findFirst({
+      where: {
+        subredditName,
+        userId: user.id,
+      },
+    });
+
+    if (!isModerator) {
+      return {
+        message: "You are not a moderator of this subreddit",
+        success: false,
+      };
+    }
+
+    const candidate = await db.user.findUnique({
+      where: {
+        username: v.data.username,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (!candidate) {
+      return {
+        message: "User not found",
+        success: false,
+      };
+    }
+
+    const moderator = await db.subredditModerator.findFirst({
+      where: {
+        subredditName,
+        userId: candidate.id,
+      },
+    });
+
+    if (moderator) {
+      return {
+        message: "User is already a moderator of this subreddit",
+        success: true,
+      };
+    }
+
+    await db.subredditModerator.create({
+      data: {
+        subredditName,
+        userId: candidate.id,
+      },
+    });
+
+    return {
+      message: "Moderator added successfully",
+      success: true,
+    };
+  } catch (e) {
+    console.log(e);
+    return {
+      message: "Failed to add moderator",
       success: false,
     };
   }
