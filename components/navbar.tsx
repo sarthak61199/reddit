@@ -2,6 +2,7 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import UserDropdown from "@/components/user-dropdown";
 import Image from "next/image";
+import CreatePost from "./create-post";
 
 function Navbar() {
   return (
@@ -17,7 +18,10 @@ function Navbar() {
             <Image src="/logo.svg" alt="logo" width={32} height={32} />
             <h1 className="text-2xl font-bold">Reddit.</h1>
           </div>
-          <UserDropdown />
+          <div className="flex items-center gap-6">
+            <CreatePost />
+            <UserDropdown />
+          </div>
         </div>
       </div>
     </header>
