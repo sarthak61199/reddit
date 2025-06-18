@@ -35,7 +35,7 @@ function PostCard({
   isDownvoted = false,
 }: RedditPostCardProps) {
   return (
-    <Card className="w-full max-w-2xl border-border bg-card">
+    <Card className="w-full border-border bg-card">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <span className="font-medium text-foreground">r/{subreddit}</span>
@@ -61,7 +61,7 @@ function PostCard({
       <CardContent className="pt-0">
         <div className="space-y-3">
           <h2 className="text-lg font-semibold leading-tight text-foreground">
-            <Link href={`/post/${id}`}>{title}</Link>
+            <Link href={`/r/sarthak/post/${id}`}>{title}</Link>
           </h2>
 
           {content && (

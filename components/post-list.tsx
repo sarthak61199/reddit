@@ -47,6 +47,50 @@ function PostList() {
         comments={10}
         isDownvoted={true}
       />
+      <PostCard
+        id="1"
+        subreddit="test"
+        username="test"
+        timeAgo="1h"
+        title="Test Post"
+        content="This is a test post"
+        upvotes={10}
+        comments={10}
+        isDownvoted={true}
+      />
+      <PostCard
+        id="1"
+        subreddit="test"
+        username="test"
+        timeAgo="1h"
+        title="Test Post"
+        content="This is a test post"
+        upvotes={10}
+        comments={10}
+        isDownvoted={true}
+      />
+      <PostCard
+        id="1"
+        subreddit="test"
+        username="test"
+        timeAgo="1h"
+        title="Test Post"
+        content="This is a test post"
+        upvotes={10}
+        comments={10}
+        isDownvoted={true}
+      />
+      <PostCard
+        id="1"
+        subreddit="test"
+        username="test"
+        timeAgo="1h"
+        title="Test Post"
+        content="This is a test post"
+        upvotes={10}
+        comments={10}
+        isDownvoted={true}
+      />
     </div>
   );
 }
