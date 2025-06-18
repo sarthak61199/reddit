@@ -1,4 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Logout from "@/components/logout";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,23 +7,30 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { getUser } from "@/lib/get-user";
 import Link from "next/link";
+import { Button } from "./ui/button";
 
-function UserDropdown() {
+async function UserDropdown() {
+  const user = await getUser();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="cursor-pointer">
         <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" />
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarImage src={user.image || "https://avatar.vercel.sh/rauchg"} />
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem asChild>
-          <Link href="/user/sarthak">Profile</Link>
+          <Button variant="ghost" className="w-full justify-start" asChild>
+            <Link href={`/user/${user.username}`}>Profile</Link>
+          </Button>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Logout</DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Logout />
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

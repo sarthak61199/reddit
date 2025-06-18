@@ -17,19 +17,40 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { authClient } from "@/lib/auth-client";
+import { signInSchema, SignInSchema } from "@/schema/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 function Page() {
-  const form = useForm({
+  const router = useRouter();
+  const form = useForm<SignInSchema>({
     defaultValues: {
       username: "",
       password: "",
     },
+    resolver: zodResolver(signInSchema),
   });
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const onSubmit = async (data: SignInSchema) => {
+    await authClient.signIn.username(
+      {
+        username: data.username,
+        password: data.password,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Signed in successfully.");
+          router.replace("/");
+        },
+        onError: ({ error }) => {
+          toast.error(error.message);
+        },
+      }
+    );
   };
 
   return (

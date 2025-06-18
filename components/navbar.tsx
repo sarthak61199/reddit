@@ -1,9 +1,11 @@
 import CreatePost from "@/components/create-post";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
 import UserDropdown from "@/components/user-dropdown";
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
 
 function Navbar({ isAuthPage = false }: { isAuthPage?: boolean }) {
   return (
@@ -29,7 +31,9 @@ function Navbar({ isAuthPage = false }: { isAuthPage?: boolean }) {
           {!isAuthPage && (
             <div className="flex items-center gap-6">
               <CreatePost />
-              <UserDropdown />
+              <Suspense fallback={<Skeleton className="size-8 rounded-full" />}>
+                <UserDropdown />
+              </Suspense>
             </div>
           )}
         </div>

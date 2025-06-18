@@ -18,21 +18,46 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { authClient } from "@/lib/auth-client";
+import { signUpSchema, type SignUpSchema } from "@/schema/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 function Page() {
-  const form = useForm({
+  const router = useRouter();
+  const form = useForm<SignUpSchema>({
     defaultValues: {
       username: "",
       email: "",
       password: "",
       imageUrl: "",
     },
+    resolver: zodResolver(signUpSchema),
   });
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const onSubmit = async (data: SignUpSchema) => {
+    await authClient.signUp.email(
+      {
+        ...data,
+        name: data.username,
+      },
+      {
+        onSuccess: () => {
+          toast.success(
+            "Account created successfully. You will be redirected to the home page in 3 seconds."
+          );
+          setTimeout(() => {
+            router.replace("/");
+          }, 3000);
+        },
+        onError: ({ error }) => {
+          toast.error(error.message);
+        },
+      }
+    );
   };
 
   return (
@@ -49,7 +74,7 @@ function Page() {
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Username</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
