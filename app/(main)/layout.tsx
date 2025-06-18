@@ -10,7 +10,7 @@ function Layout({ children }: { children: ReactNode }) {
         <Navbar />
         <div className="flex flex-1">
           <AppSidebar />
-          <SidebarInset>{children}</SidebarInset>
+          <SidebarInset className="p-4">{children}</SidebarInset>
         </div>
       </SidebarProvider>
     </div>
