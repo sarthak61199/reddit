@@ -1,61 +1,65 @@
-"use client";
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Crown, UserMinus, UserPlus, Users } from "lucide-react";
-import { useState } from "react";
+import { PLACEHOLDER_AVATAR_URL } from "@/constants";
+import db from "@/lib/db";
+import { getUser } from "@/lib/get-user";
+import { Crown, Users } from "lucide-react";
+import { notFound } from "next/navigation";
 
-interface Moderator {
-  id: string;
-  username: string;
-  avatar?: string;
-  isFounder?: boolean;
-}
+const getSubreddit = async (name: string) => {
+  const user = await getUser();
 
-interface SubredditSidebarProps {
-  subredditName?: string;
-  description?: string;
-  avatar?: string;
-  memberCount?: number;
-  moderators?: Moderator[];
-  isJoined?: boolean;
-  onJoinToggle?: () => void;
-}
-
-function SubredditSidebar({
-  subredditName = "nextjs",
-  description = "The React Framework for Production. Next.js gives you the best developer experience with all the features you need for production: hybrid static & server rendering, TypeScript support, smart bundling, route pre-fetching, and more.",
-  avatar = "https://github.com/vercel.png",
-  memberCount = 125420,
-  moderators = [
-    {
-      id: "1",
-      username: "vercel_admin",
-      avatar: "https://github.com/vercel.png",
-      isFounder: true,
+  const subreddit = await db.subreddit.findUnique({
+    where: { name },
+    select: {
+      _count: {
+        select: {
+          subredditMembers: true,
+        },
+      },
+      imageUrl: true,
+      description: true,
+      name: true,
+      subredditModerators: {
+        select: {
+          isFounder: true,
+          user: {
+            select: {
+              username: true,
+              image: true,
+            },
+          },
+        },
+      },
     },
-    {
-      id: "2",
-      username: "nextjs_mod",
-      avatar: "https://github.com/shadcn.png",
-    },
-    {
-      id: "3",
-      username: "react_expert",
-      avatar: "https://github.com/facebook.png",
-    },
-  ],
-  isJoined: initialIsJoined = false,
-  onJoinToggle,
-}: SubredditSidebarProps) {
-  const [isJoined, setIsJoined] = useState(initialIsJoined);
+  });
 
-  const handleJoinToggle = () => {
-    setIsJoined(!isJoined);
-    onJoinToggle?.();
+  if (!subreddit) {
+    notFound();
+  }
+
+  const isMember = await db.subredditMember.findUnique({
+    where: {
+      userId_subredditName: {
+        userId: user.id,
+        subredditName: name,
+      },
+    },
+  });
+
+  return {
+    isMember: !!isMember,
+    name: subreddit.name,
+    description: subreddit.description,
+    imageUrl: subreddit.imageUrl,
+    moderators: subreddit.subredditModerators,
+    memberCount: subreddit._count?.subredditMembers,
   };
+};
+
+async function SubredditSidebar({ subredditName }: { subredditName: string }) {
+  const subreddit = await getSubreddit(subredditName);
 
   const formatMemberCount = (count: number) => {
     if (count >= 1000000) {
@@ -68,14 +72,14 @@ function SubredditSidebar({
   };
 
   return (
-    <Card className="w-full max-w-sm border-border bg-card sticky top-[4.55rem]">
+    <Card className="w-full max-w-sm border-border bg-card sticky top-[4.55rem] gap-0">
       <CardHeader className="pb-4">
         <div className="flex items-center gap-3">
           <Avatar className="size-12">
-            <AvatarImage src={avatar} alt={`r/${subredditName}`} />
-            <AvatarFallback className="text-lg font-semibold bg-primary text-primary-foreground">
-              {subredditName?.charAt(0).toUpperCase()}
-            </AvatarFallback>
+            <AvatarImage
+              src={subreddit.imageUrl || PLACEHOLDER_AVATAR_URL}
+              alt={`r/${subreddit.name}`}
+            />
           </Avatar>
           <div className="flex-1 min-w-0">
             <h2 className="text-xl font-bold text-foreground truncate">
@@ -83,7 +87,9 @@ function SubredditSidebar({
             </h2>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Users className="size-4" />
-              <span>{formatMemberCount(memberCount)} members</span>
+              <span>
+                {formatMemberCount(subreddit.memberCount || 0)} members
+              </span>
             </div>
           </div>
         </div>
@@ -93,21 +99,21 @@ function SubredditSidebar({
         {/* Description */}
         <div>
           <p className="text-sm text-muted-foreground leading-relaxed line-clamp-4">
-            {description}
+            {subreddit.description}
           </p>
         </div>
 
         {/* Join/Leave Button */}
-        <Button
+        {/* <Button
           onClick={handleJoinToggle}
           className={`w-full ${
-            isJoined
+            true
               ? "bg-muted text-muted-foreground hover:bg-destructive hover:text-destructive-foreground"
               : "bg-primary text-primary-foreground hover:bg-primary/90"
           }`}
-          variant={isJoined ? "outline" : "default"}
+          variant={true ? "outline" : "default"}
         >
-          {isJoined ? (
+          {true ? (
             <>
               <UserMinus className="size-4 mr-2" />
               Leave
@@ -118,7 +124,7 @@ function SubredditSidebar({
               Join
             </>
           )}
-        </Button>
+        </Button> */}
 
         <Separator className="bg-border" />
 
@@ -129,20 +135,20 @@ function SubredditSidebar({
             Moderators
           </h3>
           <div className="space-y-2">
-            {moderators.map((moderator) => (
-              <div key={moderator.id} className="flex items-center gap-2">
+            {subreddit.moderators.map((moderator) => (
+              <div
+                key={moderator.user.username}
+                className="flex items-center gap-2"
+              >
                 <Avatar className="size-6">
                   <AvatarImage
-                    src={moderator.avatar}
-                    alt={moderator.username}
+                    src={moderator.user.image || PLACEHOLDER_AVATAR_URL}
+                    alt={moderator.user.username || "User avatar"}
                   />
-                  <AvatarFallback className="text-xs">
-                    {moderator.username.charAt(0).toUpperCase()}
-                  </AvatarFallback>
                 </Avatar>
                 <div className="flex items-center gap-1 min-w-0 flex-1">
                   <span className="text-sm text-foreground truncate">
-                    u/{moderator.username}
+                    u/{moderator.user.username}
                   </span>
                   {moderator.isFounder && (
                     <Crown className="size-3 text-primary flex-shrink-0" />

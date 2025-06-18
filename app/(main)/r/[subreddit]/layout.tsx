@@ -1,11 +1,19 @@
 import SubredditSidebar from "@/components/subreddit-sidebar";
 import { ReactNode } from "react";
 
-function Layout({ children }: { children: ReactNode }) {
+async function Layout({
+  children,
+  params,
+}: {
+  children: ReactNode;
+  params: Promise<{ subreddit: string }>;
+}) {
+  const { subreddit } = await params;
+
   return (
     <div className="flex gap-4 items-start">
       <div className="flex-1">{children}</div>
-      <SubredditSidebar />
+      <SubredditSidebar subredditName={subreddit} />
     </div>
   );
 }

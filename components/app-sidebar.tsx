@@ -11,6 +11,9 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { PLACEHOLDER_AVATAR_URL } from "@/constants";
+import db from "@/lib/db";
+import { getUser } from "@/lib/get-user";
 import Link from "next/link";
 
 const data = {
@@ -26,7 +29,32 @@ const data = {
   ],
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+const getSubreddits = async () => {
+  const user = await getUser();
+
+  const subreddits = await db.subreddit.findMany({
+    orderBy: {
+      name: "asc",
+    },
+    where: {
+      subredditMembers: {
+        some: { userId: user.id },
+      },
+    },
+    select: {
+      name: true,
+      imageUrl: true,
+    },
+  });
+
+  return subreddits;
+};
+
+export async function AppSidebar({
+  ...props
+}: React.ComponentProps<typeof Sidebar>) {
+  const subreddits = await getSubreddits();
+
   return (
     <Sidebar
       className="top-(--header-height) h-[calc(100svh-var(--header-height))]!"
@@ -50,15 +78,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="flex flex-col gap-1">
-              {data.navMain.map((item) => (
-                <SidebarMenuItem key={item.title}>
+              {subreddits.map((item) => (
+                <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton asChild>
-                    <Link href={item.url} className="h-full">
+                    <Link href={`/r/${item.name}`} className="h-full font-bold">
                       <Avatar className="size-8">
-                        <AvatarImage src="https://github.com/shadcn.png" />
-                        <AvatarFallback>CN</AvatarFallback>
+                        <AvatarImage
+                          src={item.imageUrl || PLACEHOLDER_AVATAR_URL}
+                        />
                       </Avatar>
-                      r/{item.title}
+                      r/{item.name}
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

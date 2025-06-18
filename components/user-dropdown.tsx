@@ -7,6 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PLACEHOLDER_AVATAR_URL } from "@/constants";
 import { getUser } from "@/lib/get-user";
 import Link from "next/link";
 import { Button } from "./ui/button";
@@ -18,7 +19,7 @@ async function UserDropdown() {
     <DropdownMenu>
       <DropdownMenuTrigger className="cursor-pointer">
         <Avatar>
-          <AvatarImage src={user.image || "https://avatar.vercel.sh/rauchg"} />
+          <AvatarImage src={user.image || PLACEHOLDER_AVATAR_URL} />
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

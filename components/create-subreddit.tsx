@@ -1,5 +1,7 @@
 "use client";
 
+import { createSubreddit } from "@/actions/subreddit";
+import ImageUploader from "@/components/image-uploader";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -18,24 +20,49 @@ import {
 } from "@/components/ui/form";
 import InputIcon from "@/components/ui/input-icon";
 import { Textarea } from "@/components/ui/textarea";
+import { tryCatch } from "@/hooks/try-catch";
 import { useDisclosure } from "@/hooks/use-disclosure";
-import { Plus } from "lucide-react";
+import {
+  CreateSubredditSchema,
+  createSubredditSchema,
+} from "@/schema/subreddit";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 import { useForm } from "react-hook-form";
-import ImageUploader from "./image-uploader";
+import { toast } from "sonner";
 
 function CreateSubreddit() {
-  const { isOpen, onOpen, onToggle } = useDisclosure();
+  const [isPending, startTransition] = useTransition();
+  const { isOpen, onOpen, onToggle, onClose } = useDisclosure();
+  const router = useRouter();
 
-  const form = useForm({
+  const form = useForm<CreateSubredditSchema>({
     defaultValues: {
       name: "",
       description: "",
       imageUrl: "",
     },
+    resolver: zodResolver(createSubredditSchema),
   });
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const onSubmit = (data: CreateSubredditSchema) => {
+    startTransition(async () => {
+      const { error, response } = await tryCatch(createSubreddit(data));
+
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+
+      if (response?.success) {
+        toast.success(response.message);
+        onClose();
+        form.reset();
+        router.push(`/r/${response.data?.name}`);
+      }
+    });
   };
 
   return (
@@ -101,8 +128,13 @@ function CreateSubreddit() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" size={"lg"}>
-                <Plus />
+              <Button
+                type="submit"
+                className="w-full"
+                size={"lg"}
+                disabled={isPending}
+              >
+                {isPending ? <Loader2 className="animate-spin" /> : <Plus />}
                 Create Subreddit
               </Button>
             </form>

@@ -1,6 +1,9 @@
 import PostList from "@/components/post-list";
+import db from "@/lib/db";
+import { getUser } from "@/lib/get-user";
+import { notFound } from "next/navigation";
 
-function Page() {
+async function Page({ params }: { params: Promise<{ subreddit: string }> }) {
   return (
     <div>
       <PostList />
