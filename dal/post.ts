@@ -1,11 +1,32 @@
 import db from "@/lib/db";
+import { Prisma } from "@/lib/generated/prisma";
 import { getUser } from "@/lib/get-user";
 import { notFound } from "next/navigation";
 
-export const getPosts = async (page: number = 1, limit: number = 10) => {
+export const getPosts = async (
+  page: number = 1,
+  limit: number = 10,
+  subreddit?: string,
+  username?: string
+) => {
   const user = await getUser();
 
+  const where: Prisma.PostWhereInput = {};
+
+  if (subreddit) {
+    where.subreddit = {
+      name: subreddit,
+    };
+  }
+
+  if (username) {
+    where.user = {
+      username,
+    };
+  }
+
   const posts = await db.post.findMany({
+    where,
     orderBy: {
       createdAt: "desc",
     },

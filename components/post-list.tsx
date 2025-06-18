@@ -2,6 +2,8 @@
 
 import PostCard from "@/components/post-card";
 import { GetPosts } from "@/dal/post";
+import { Loader2 } from "lucide-react";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
@@ -12,16 +14,22 @@ function PostList({
   posts: GetPosts["posts"];
   hasMore: GetPosts["hasMore"];
 }) {
+  const { subreddit, username } = useParams();
+
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(2);
   const [posts, setPosts] = useState<GetPosts["posts"]>(initialPosts);
 
   const { ref, inView } = useInView();
 
+  const URL = `/api/posts?page=${page}${
+    subreddit ? `&subreddit=${subreddit}` : ""
+  }${username ? `&username=${username}` : ""}`;
+
   const fetchPosts = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/posts?page=${page}`);
+      const response = await fetch(URL);
       const data = (await response.json()) as GetPosts["posts"];
       setPosts((prev) => [...prev, ...data]);
       setPage((prev) => prev + 1);
@@ -43,7 +51,11 @@ function PostList({
       {posts.map((post) => (
         <PostCard key={post.id} post={post} />
       ))}
-      {isLoading && <div>Loading...</div>}
+      {isLoading && (
+        <div className="flex items-center justify-center">
+          <Loader2 className="animate-spin" />
+        </div>
+      )}
       {hasMore && <div ref={ref} />}
     </div>
   );

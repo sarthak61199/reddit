@@ -24,7 +24,7 @@ async function UserDropdown() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem asChild>
-          <Button variant="ghost" className="w-full justify-start" asChild>
+          <Button variant="ghost" className="w-full justify-start">
             <Link href={`/user/${user.username}`}>Profile</Link>
           </Button>
         </DropdownMenuItem>
