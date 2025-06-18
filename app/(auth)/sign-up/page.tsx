@@ -1,5 +1,6 @@
 "use client";
 
+import ImageUploader from "@/components/image-uploader";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,7 +25,9 @@ function Page() {
   const form = useForm({
     defaultValues: {
       username: "",
+      email: "",
       password: "",
+      imageUrl: "",
     },
   });
 
@@ -35,8 +38,8 @@ function Page() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle>Sign In</CardTitle>
-        <CardDescription>Sign in to your account</CardDescription>
+        <CardTitle>Sign Up</CardTitle>
+        <CardDescription>Create an account to get started</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -46,9 +49,22 @@ function Page() {
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="email" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -67,14 +83,30 @@ function Page() {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="imageUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Avatar</FormLabel>
+                  <FormControl>
+                    <ImageUploader
+                      onChange={field.onChange}
+                      value={field.value}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <div className="flex flex-col gap-4">
               <Button type="submit" className="w-full">
-                Sign In
+                Sign Up
               </Button>
               <p className="text-sm text-center text-muted-foreground">
-                Don't have an account?{" "}
-                <Link href="/sign-up" className="hover:underline">
-                  Sign Up
+                Already have an account?{" "}
+                <Link href="/sign-in" className="hover:underline">
+                  Sign In
                 </Link>
               </p>
             </div>
