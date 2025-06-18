@@ -1,8 +1,9 @@
+import CreatePost from "@/components/create-post";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import UserDropdown from "@/components/user-dropdown";
 import Image from "next/image";
-import CreatePost from "./create-post";
+import Link from "next/link";
 
 function Navbar({ isAuthPage = false }: { isAuthPage?: boolean }) {
   return (
@@ -18,10 +19,13 @@ function Navbar({ isAuthPage = false }: { isAuthPage?: boolean }) {
           </>
         )}
         <div className="flex items-center justify-between w-full">
-          <div className="flex items-center gap-2">
+          <Link
+            href={isAuthPage ? "/sign-in" : "/"}
+            className="flex items-center gap-2"
+          >
             <Image src="/logo.svg" alt="logo" width={32} height={32} />
             <h1 className="text-2xl font-bold">Reddit.</h1>
-          </div>
+          </Link>
           {!isAuthPage && (
             <div className="flex items-center gap-6">
               <CreatePost />
