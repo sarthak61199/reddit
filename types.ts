@@ -18,5 +18,6 @@ export type CommentWithVotes = {
   };
   parentId: string | null;
   userVote: VoteType | null;
+  postId: string;
   replies?: CommentWithVotes[];
 };

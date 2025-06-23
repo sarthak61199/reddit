@@ -21,9 +21,11 @@ import { toast } from "sonner";
 function CommentBox({
   postId,
   parentId,
+  onSuccess,
 }: {
   postId: string;
   parentId?: string;
+  onSuccess?: () => void;
 }) {
   const [isPending, startTransition] = useTransition();
   const form = useForm<CreateCommentSchema>({
@@ -46,6 +48,7 @@ function CommentBox({
 
       toast.success(response.message);
       form.reset();
+      onSuccess?.();
     });
   };
 
