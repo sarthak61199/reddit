@@ -152,6 +152,9 @@ model Comment {
   userId       String
   post         Post          @relation(fields: [postId], references: [id])
   postId       String
+  parentId     String?
+  parent       Comment?      @relation("CommentReplies", fields: [parentId], references: [id])
+  replies      Comment[]     @relation("CommentReplies")
   commentVotes CommentVote[]
 
   @@map("comment")
