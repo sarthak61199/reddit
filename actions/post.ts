@@ -5,6 +5,7 @@ import { VoteType } from "@/lib/generated/prisma";
 import { getUser } from "@/lib/get-user";
 import { createPostSchema, CreatePostSchema } from "@/schema/post";
 import { Response } from "@/types";
+import { revalidatePath } from "next/cache";
 
 export const createPost = async (
   input: CreatePostSchema
@@ -135,6 +136,8 @@ export const votePost = async (
         },
       });
     }
+
+    revalidatePath(`/(main)/r/[subreddit]/post/[postId]`, "page");
 
     return {
       message: "Vote updated successfully",

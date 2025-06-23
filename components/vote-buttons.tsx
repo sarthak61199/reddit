@@ -3,8 +3,17 @@
 import { voteComment } from "@/actions/comment";
 import { votePost } from "@/actions/post";
 import { Button } from "@/components/ui/button";
+import { tryCatch } from "@/hooks/try-catch";
 import { VoteType } from "@/lib/generated/prisma";
+import { Response } from "@/types";
 import { ArrowDown, ArrowUp } from "lucide-react";
+import { useOptimistic, useTransition } from "react";
+import { toast } from "sonner";
+
+type VoteState = {
+  userVote: VoteType | null;
+  voteCount: number;
+};
 
 function VoteButtons({
   userVote,
@@ -13,45 +22,106 @@ function VoteButtons({
 }: {
   userVote: VoteType | null;
   voteCount: number;
-  action: (voteType: VoteType | null) => void;
+  action: (voteType: VoteType | null) => Promise<Response>;
 }) {
+  const [_, startTransition] = useTransition();
+
+  const [optimisticVoteState, addOptimisticVote] = useOptimistic(
+    { userVote, voteCount },
+    (state: VoteState, newVoteType: VoteType | null) => {
+      let voteCountChange = 0;
+      let newUserVote = newVoteType;
+
+      if (!newVoteType) {
+        // User wants to remove their vote
+        if (state.userVote) {
+          voteCountChange = state.userVote === VoteType.UPVOTE ? -1 : 1;
+          newUserVote = null;
+        }
+      } else {
+        // User wants to add or change their vote
+        if (state.userVote) {
+          if (state.userVote !== newVoteType) {
+            // Switching from upvote to downvote or vice versa
+            voteCountChange = newVoteType === VoteType.UPVOTE ? 2 : -2;
+          } else {
+            // Same vote type - this should remove the vote
+            voteCountChange = state.userVote === VoteType.UPVOTE ? -1 : 1;
+            newUserVote = null;
+          }
+        } else {
+          // New vote
+          voteCountChange = newVoteType === VoteType.UPVOTE ? 1 : -1;
+        }
+      }
+
+      return {
+        userVote: newUserVote,
+        voteCount: state.voteCount + voteCountChange,
+      };
+    }
+  );
+
+  const handleVote = async (voteType: VoteType | null) => {
+    startTransition(async () => {
+      addOptimisticVote(voteType);
+      const { response, error } = await tryCatch(action(voteType));
+
+      if (error || !response?.success) {
+        addOptimisticVote(userVote);
+        toast.error(error?.message || response?.message);
+        return;
+      }
+
+      toast.success(response.message);
+    });
+  };
+
   return (
     <div className="flex items-center bg-muted rounded-full w-fit">
       <Button
         variant="ghost"
         size="sm"
         className={`h-8 px-2 rounded-l-full hover:bg-muted-foreground/10 ${
-          userVote === VoteType.UPVOTE
+          optimisticVoteState.userVote === VoteType.UPVOTE
             ? "text-orange-500 hover:text-orange-600"
             : "text-muted-foreground"
         }`}
         onClick={() =>
-          action(userVote === VoteType.UPVOTE ? null : VoteType.UPVOTE)
+          handleVote(
+            optimisticVoteState.userVote === VoteType.UPVOTE
+              ? null
+              : VoteType.UPVOTE
+          )
         }
       >
         <ArrowUp className="h-4 w-4" />
       </Button>
       <span
         className={`px-1 text-sm font-medium min-w-[2rem] text-center ${
-          userVote === VoteType.UPVOTE
+          optimisticVoteState.userVote === VoteType.UPVOTE
             ? "text-orange-500"
-            : userVote === VoteType.DOWNVOTE
+            : optimisticVoteState.userVote === VoteType.DOWNVOTE
             ? "text-blue-500"
             : "text-foreground"
         }`}
       >
-        {voteCount}
+        {optimisticVoteState.voteCount}
       </span>
       <Button
         variant="ghost"
         size="sm"
         className={`h-8 px-2 rounded-r-full hover:bg-muted-foreground/10 ${
-          userVote === VoteType.DOWNVOTE
+          optimisticVoteState.userVote === VoteType.DOWNVOTE
             ? "text-blue-500 hover:text-blue-600"
             : "text-muted-foreground"
         }`}
         onClick={() =>
-          action(userVote === VoteType.DOWNVOTE ? null : VoteType.DOWNVOTE)
+          handleVote(
+            optimisticVoteState.userVote === VoteType.DOWNVOTE
+              ? null
+              : VoteType.DOWNVOTE
+          )
         }
       >
         <ArrowDown className="h-4 w-4" />
