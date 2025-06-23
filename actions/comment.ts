@@ -1,6 +1,7 @@
 "use server";
 
 import db from "@/lib/db";
+import { VoteType } from "@/lib/generated/prisma";
 import { getUser } from "@/lib/get-user";
 import { createCommentSchema, CreateCommentSchema } from "@/schema/comment";
 import { Response } from "@/types";
@@ -24,12 +25,20 @@ export const createComment = async (
   const { content } = v.data;
 
   try {
-    await db.comment.create({
+    const comment = await db.comment.create({
       data: {
         content,
         postId,
         parentId,
         userId: user.id,
+      },
+    });
+
+    await db.commentVote.create({
+      data: {
+        userId: user.id,
+        commentId: comment.id,
+        voteType: VoteType.UPVOTE,
       },
     });
 
