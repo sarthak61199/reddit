@@ -50,6 +50,15 @@ export const getPosts = async (
           image: true,
         },
       },
+      postVotes: {
+        where: {
+          userId: user.id,
+        },
+        select: {
+          voteType: true,
+        },
+        take: 1,
+      },
       _count: {
         select: {
           comments: true,
@@ -58,29 +67,8 @@ export const getPosts = async (
     },
   });
 
-  const postPromise = posts.map(async (post) => {
-    const userVote = await db.postVote.findUnique({
-      where: {
-        userId_postId: {
-          userId: user.id,
-          postId: post.id,
-        },
-      },
-      select: {
-        voteType: true,
-      },
-    });
-
+  const postsWithUserVote = posts.map((post) => {
     return {
-      ...post,
-      userVote,
-    };
-  });
-
-  const postsWithUserVote = await Promise.all(postPromise);
-
-  return {
-    posts: postsWithUserVote.map((post) => ({
       id: post.id,
       title: post.title,
       content: post.content,
@@ -89,9 +77,13 @@ export const getPosts = async (
       subreddit: post.subreddit,
       voteCount: post.voteCount,
       user: post.user,
-      userVote: post.userVote?.voteType ?? null,
+      userVote: post.postVotes[0]?.voteType ?? null,
       commentCount: post._count.comments,
-    })),
+    };
+  });
+
+  return {
+    posts: postsWithUserVote,
     hasMore: postsWithUserVote.length === limit,
   };
 };
