@@ -94,7 +94,7 @@ function PostCard({
               size="sm"
               className="h-8 px-3 text-muted-foreground hover:bg-muted"
             >
-              <MessageCircle className="h-4 w-4 mr-1" />
+              <MessageCircle className="size-4 mr-1" />
               <span className="text-sm">{commentCount}</span>
             </Button>
           </div>

@@ -1,11 +1,13 @@
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import VoteButtons from "@/components/vote-buttons";
 import { PLACEHOLDER_AVATAR_URL } from "@/constants";
 import { GetComments } from "@/dal/comment";
 import { dayjs } from "@/lib/dayjs";
+import { Reply } from "lucide-react";
 
-function CommentItem({ comment }: { comment: GetComments[0] }) {
+function CommentItem({ comment }: { comment: GetComments[number] }) {
   return (
     <Card key={comment.id} className="border-none gap-0">
       <CardHeader className="pl-0 pb-1">
@@ -28,10 +30,20 @@ function CommentItem({ comment }: { comment: GetComments[0] }) {
           <p className="text-sm text-muted-foreground leading-relaxed">
             {comment.content}
           </p>
-          <VoteButtons
-            userVote={comment.userVote}
-            voteCount={comment.voteCount}
-          />
+          <div className="flex items-center gap-1 pt-2">
+            <VoteButtons
+              userVote={comment.userVote}
+              voteCount={comment.voteCount}
+            />
+
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 px-3 text-muted-foreground hover:bg-muted"
+            >
+              <Reply className="size-4" />
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
