@@ -1,12 +1,12 @@
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import VoteButtons from "@/components/vote-buttons";
 import { PLACEHOLDER_AVATAR_URL } from "@/constants";
 import { GetPost } from "@/dal/post";
 import { dayjs } from "@/lib/dayjs";
-import { VoteType } from "@/lib/generated/prisma";
 import { cn } from "@/lib/utils";
-import { ArrowDown, ArrowUp, MessageCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -87,41 +87,7 @@ function PostCard({
           )}
 
           <div className="flex items-center gap-1 pt-2">
-            <div className="flex items-center bg-muted rounded-full">
-              <Button
-                variant="ghost"
-                size="sm"
-                className={`h-8 px-2 rounded-l-full hover:bg-muted-foreground/10 ${
-                  userVote === VoteType.UPVOTE
-                    ? "text-orange-500 hover:text-orange-600"
-                    : "text-muted-foreground"
-                }`}
-              >
-                <ArrowUp className="h-4 w-4" />
-              </Button>
-              <span
-                className={`px-1 text-sm font-medium min-w-[2rem] text-center ${
-                  userVote === VoteType.UPVOTE
-                    ? "text-orange-500"
-                    : userVote === VoteType.DOWNVOTE
-                    ? "text-blue-500"
-                    : "text-foreground"
-                }`}
-              >
-                {voteCount}
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                className={`h-8 px-2 rounded-r-full hover:bg-muted-foreground/10 ${
-                  userVote === VoteType.DOWNVOTE
-                    ? "text-blue-500 hover:text-blue-600"
-                    : "text-muted-foreground"
-                }`}
-              >
-                <ArrowDown className="h-4 w-4" />
-              </Button>
-            </div>
+            <VoteButtons userVote={userVote} voteCount={voteCount} />
 
             <Button
               variant="ghost"
