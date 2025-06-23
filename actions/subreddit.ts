@@ -9,6 +9,7 @@ import {
   CreateSubredditSchema,
 } from "@/schema/subreddit";
 import { Response } from "@/types";
+import { revalidatePath } from "next/cache";
 
 export const createSubreddit = async (
   input: CreateSubredditSchema
@@ -139,6 +140,74 @@ export const addModerator = async (
     console.log(e);
     return {
       message: "Failed to add moderator",
+      success: false,
+    };
+  }
+};
+
+export const joinOrLeaveSubreddit = async (
+  subredditName: string
+): Promise<Response> => {
+  const user = await getUser();
+
+  try {
+    const subreddit = await db.subreddit.findUnique({
+      where: {
+        name: subredditName,
+      },
+    });
+
+    if (!subreddit) {
+      return {
+        message: "Subreddit not found",
+        success: false,
+      };
+    }
+
+    const isMember = await db.subredditMember.findUnique({
+      where: {
+        userId_subredditName: {
+          userId: user.id,
+          subredditName,
+        },
+      },
+    });
+
+    if (isMember) {
+      await db.subredditMember.delete({
+        where: {
+          userId_subredditName: {
+            userId: user.id,
+            subredditName,
+          },
+        },
+      });
+
+      revalidatePath(`/r/${subredditName}`, "layout");
+
+      return {
+        message: "You have left the subreddit",
+        success: true,
+      };
+    }
+
+    await db.subredditMember.create({
+      data: {
+        userId: user.id,
+        subredditName,
+      },
+    });
+
+    revalidatePath(`/r/${subredditName}`, "layout");
+
+    return {
+      message: "You have joined the subreddit",
+      success: true,
+    };
+  } catch (e) {
+    console.log(e);
+    return {
+      message: "Failed to join subreddit",
       success: false,
     };
   }

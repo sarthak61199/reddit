@@ -1,10 +1,11 @@
+import AddModerator from "@/components/add-moderator";
+import JoinSubreddit from "@/components/join-subreddit";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { PLACEHOLDER_AVATAR_URL } from "@/constants";
 import { getSubreddit } from "@/dal/subreddit";
 import { Crown, Users } from "lucide-react";
-import AddModerator from "./add-moderator";
 
 async function SubredditSidebar({ subredditName }: { subredditName: string }) {
   const subreddit = await getSubreddit(subredditName);
@@ -52,27 +53,10 @@ async function SubredditSidebar({ subredditName }: { subredditName: string }) {
         </div>
 
         {/* Join/Leave Button */}
-        {/* <Button
-          onClick={handleJoinToggle}
-          className={`w-full ${
-            true
-              ? "bg-muted text-muted-foreground hover:bg-destructive hover:text-destructive-foreground"
-              : "bg-primary text-primary-foreground hover:bg-primary/90"
-          }`}
-          variant={true ? "outline" : "default"}
-        >
-          {true ? (
-            <>
-              <UserMinus className="size-4 mr-2" />
-              Leave
-            </>
-          ) : (
-            <>
-              <UserPlus className="size-4 mr-2" />
-              Join
-            </>
-          )}
-        </Button> */}
+        <JoinSubreddit
+          isMember={subreddit.isMember}
+          subredditName={subreddit.name}
+        />
 
         <Separator className="bg-border" />
 
