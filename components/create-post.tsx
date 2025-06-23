@@ -34,9 +34,8 @@ import { useDisclosure } from "@/hooks/use-disclosure";
 import { createPostSchema, CreatePostSchema } from "@/schema/post";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Plus } from "lucide-react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { use, useTransition } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { use, useEffect, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -46,7 +45,8 @@ function CreatePost({
   subredditsPromise: Promise<Subreddits>;
 }) {
   const router = useRouter();
-  const { isOpen, onOpen, onToggle, onClose } = useDisclosure();
+  const params = useParams();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [isPending, startTransition] = useTransition();
 
   const subreddits = use(subredditsPromise);
@@ -60,6 +60,12 @@ function CreatePost({
     },
     resolver: zodResolver(createPostSchema),
   });
+
+  useEffect(() => {
+    if (params.subreddit) {
+      form.setValue("subreddit", params.subreddit as string);
+    }
+  }, [params.subreddit]);
 
   const onSubmit = async (data: CreatePostSchema) => {
     startTransition(async () => {
@@ -85,7 +91,13 @@ function CreatePost({
         <Plus />
         Create Post
       </Button>
-      <Dialog open={isOpen} onOpenChange={onToggle}>
+      <Dialog
+        open={isOpen}
+        onOpenChange={() => {
+          onClose();
+          form.reset();
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create Post</DialogTitle>
