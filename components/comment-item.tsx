@@ -1,7 +1,7 @@
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import VoteButtons from "@/components/vote-buttons";
+import { CommentVoteButtons } from "@/components/vote-buttons";
 import { PLACEHOLDER_AVATAR_URL } from "@/constants";
 import { GetComments } from "@/dal/comment";
 import { dayjs } from "@/lib/dayjs";
@@ -31,7 +31,8 @@ function CommentItem({ comment }: { comment: GetComments[number] }) {
             {comment.content}
           </p>
           <div className="flex items-center gap-1 pt-2">
-            <VoteButtons
+            <CommentVoteButtons
+              commentId={comment.id}
               userVote={comment.userVote}
               voteCount={comment.voteCount}
             />

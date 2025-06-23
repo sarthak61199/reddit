@@ -54,3 +54,92 @@ export const createComment = async (
     };
   }
 };
+
+export const voteComment = async (
+  commentId: string,
+  voteType: VoteType | null
+): Promise<Response> => {
+  const user = await getUser();
+
+  try {
+    const comment = await db.comment.findUnique({
+      where: { id: commentId },
+    });
+
+    if (!comment) {
+      return {
+        message: "Comment not found",
+        success: false,
+      };
+    }
+
+    const existingVote = await db.commentVote.findFirst({
+      where: {
+        commentId,
+        userId: user.id,
+      },
+    });
+
+    let voteCountChange = 0;
+
+    if (!voteType) {
+      if (existingVote) {
+        await db.commentVote.delete({
+          where: {
+            userId_commentId: {
+              userId: user.id,
+              commentId,
+            },
+          },
+        });
+
+        voteCountChange = existingVote.voteType === VoteType.UPVOTE ? -1 : 1;
+      }
+    } else {
+      if (existingVote) {
+        if (existingVote.voteType !== voteType) {
+          voteCountChange = voteType === VoteType.UPVOTE ? 2 : -2;
+        }
+      } else {
+        voteCountChange = voteType === VoteType.UPVOTE ? 1 : -1;
+      }
+
+      await db.commentVote.upsert({
+        where: {
+          userId_commentId: {
+            userId: user.id,
+            commentId,
+          },
+        },
+        create: {
+          userId: user.id,
+          commentId,
+          voteType: voteType,
+        },
+        update: {
+          voteType: voteType,
+        },
+      });
+    }
+
+    if (voteCountChange !== 0) {
+      await db.comment.update({
+        where: { id: commentId },
+        data: {
+          voteCount: { increment: voteCountChange },
+        },
+      });
+    }
+
+    return {
+      message: "Vote updated successfully",
+      success: true,
+    };
+  } catch (e) {
+    console.log(e);
+    return {
+      message: "Failed to vote",
+      success: false,
+    };
+  }
+};

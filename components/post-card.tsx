@@ -1,7 +1,7 @@
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import VoteButtons from "@/components/vote-buttons";
+import { PostVoteButtons } from "@/components/vote-buttons";
 import { PLACEHOLDER_AVATAR_URL } from "@/constants";
 import { GetPost } from "@/dal/post";
 import { dayjs } from "@/lib/dayjs";
@@ -87,7 +87,11 @@ function PostCard({
           )}
 
           <div className="flex items-center gap-1 pt-2">
-            <VoteButtons userVote={userVote} voteCount={voteCount} />
+            <PostVoteButtons
+              postId={id}
+              userVote={userVote}
+              voteCount={voteCount}
+            />
 
             <Button
               variant="ghost"
