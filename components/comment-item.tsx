@@ -9,7 +9,7 @@ import { Reply } from "lucide-react";
 
 function CommentItem({ comment }: { comment: GetComments[number] }) {
   return (
-    <Card key={comment.id} className="border-none gap-0">
+    <Card key={comment.id} className="border-none gap-0 p-0">
       <CardHeader className="pl-0 pb-1">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <div className="flex items-center gap-1">

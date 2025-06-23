@@ -43,6 +43,8 @@ export const createComment = async (
       },
     });
 
+    revalidatePath(`/(main)/r/[subreddit]/post/[postId]`, "page");
+
     return {
       message: "Comment created successfully",
       success: true,
