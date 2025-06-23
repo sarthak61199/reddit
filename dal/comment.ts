@@ -60,4 +60,31 @@ export const getComments = async (postId: string) => {
   return buildCommentTree(commentsWithVotes);
 };
 
+export const getUserComments = async (username: string) => {
+  await getUser();
+
+  const comments = await db.comment.findMany({
+    where: {
+      user: {
+        username,
+      },
+    },
+    select: {
+      id: true,
+      content: true,
+      createdAt: true,
+      voteCount: true,
+      post: {
+        select: {
+          title: true,
+          subredditName: true,
+        },
+      },
+    },
+  });
+
+  return comments;
+};
+
 export type GetComments = Awaited<ReturnType<typeof getComments>>;
+export type GetUserComments = Awaited<ReturnType<typeof getUserComments>>;

@@ -19,10 +19,12 @@ function VoteButtons({
   userVote,
   voteCount,
   action,
+  disabled = false,
 }: {
   userVote: VoteType | null;
   voteCount: number;
   action: (voteType: VoteType | null) => Promise<Response>;
+  disabled?: boolean;
 }) {
   const [_, startTransition] = useTransition();
 
@@ -94,6 +96,7 @@ function VoteButtons({
               : VoteType.UPVOTE
           )
         }
+        disabled={disabled}
       >
         <ArrowUp className="h-4 w-4" />
       </Button>
@@ -123,6 +126,7 @@ function VoteButtons({
               : VoteType.DOWNVOTE
           )
         }
+        disabled={disabled}
       >
         <ArrowDown className="h-4 w-4" />
       </Button>
@@ -134,16 +138,19 @@ export function PostVoteButtons({
   postId,
   userVote,
   voteCount,
+  disabled = false,
 }: {
   postId: string;
   userVote: VoteType | null;
   voteCount: number;
+  disabled?: boolean;
 }) {
   return (
     <VoteButtons
       userVote={userVote}
       voteCount={voteCount}
       action={(voteType) => votePost(postId, voteType)}
+      disabled={disabled}
     />
   );
 }
@@ -152,10 +159,12 @@ export function CommentVoteButtons({
   commentId,
   userVote,
   voteCount,
+  disabled = false,
 }: {
   commentId: string;
   userVote: VoteType | null;
   voteCount: number;
+  disabled?: boolean;
 }) {
   return (
     <VoteButtons

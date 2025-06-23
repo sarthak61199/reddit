@@ -74,14 +74,11 @@ function PostCard({
           {imageUrl && (
             <div className="relative w-full max-h-96 overflow-hidden rounded-md border border-border">
               <Image
-                src={imageUrl || "/placeholder.svg"}
+                src={imageUrl}
                 alt="Post image"
                 width={600}
                 height={400}
                 className="w-full h-auto max-h-96 object-cover"
-                style={{
-                  objectFit: "cover",
-                }}
               />
             </div>
           )}

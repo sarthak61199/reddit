@@ -21,7 +21,7 @@ async function SubredditSidebar({ subredditName }: { subredditName: string }) {
   };
 
   return (
-    <Card className="w-full max-w-sm border-border bg-card sticky top-[4.55rem] gap-0">
+    <Card className="w-full max-w-sm border-border bg-card sticky top-[4.55rem] gap-0 hidden lg:block">
       <CardHeader className="pb-4">
         <div className="flex items-center gap-3">
           <Avatar className="size-12">
