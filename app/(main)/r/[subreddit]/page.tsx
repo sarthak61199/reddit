@@ -6,11 +6,7 @@ async function Page({ params }: { params: Promise<{ subreddit: string }> }) {
 
   const posts = await getPosts(1, 10, subreddit);
 
-  return (
-    <div>
-      <PostList posts={posts.posts} hasMore={posts.hasMore} />
-    </div>
-  );
+  return <PostList posts={posts.posts} hasMore={posts.hasMore} />;
 }
 
 export default Page;

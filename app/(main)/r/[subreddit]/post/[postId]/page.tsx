@@ -10,7 +10,7 @@ async function Page({ params }: { params: Promise<{ postId: string }> }) {
   const post = await getPost(postId);
 
   return (
-    <div className="flex flex-col gap-4 justify-center max-w-2xl mx-auto">
+    <div className="flex flex-col gap-4 justify-center container">
       <PostCard post={post} isPostPage />
       <CommentBox />
       <Separator />

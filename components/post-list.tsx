@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
+import { Frown } from "lucide-react";
 
 function PostList({
   posts: initialPosts,
@@ -47,10 +48,14 @@ function PostList({
   }, [inView, hasMore]);
 
   return (
-    <div className="flex flex-col gap-4 items-center">
-      {posts.map((post) => (
-        <PostCard key={post.id} post={post} />
-      ))}
+    <div className="flex flex-col gap-4 items-center h-full ">
+      {posts.length > 0 ? (
+        posts.map((post) => <PostCard key={post.id} post={post} />)
+      ) : (
+        <p className="text-lg text-muted-foreground flex items-center gap-2">
+          No posts found <Frown className="size-5" />
+        </p>
+      )}
       {isLoading && (
         <div className="flex items-center justify-center">
           <Loader2 className="animate-spin" />
