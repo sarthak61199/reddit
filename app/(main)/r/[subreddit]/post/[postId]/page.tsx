@@ -12,7 +12,7 @@ async function Page({ params }: { params: Promise<{ postId: string }> }) {
   return (
     <div className="flex flex-col gap-4 justify-center container">
       <PostCard post={post} isPostPage />
-      <CommentBox />
+      <CommentBox postId={postId} />
       <Separator />
       <CommentList />
     </div>
