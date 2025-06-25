@@ -9,9 +9,10 @@ export function useMutation(): MutationResult {
     mutationFn: () => Promise<Response<TData>>,
     options: MutationOptions<Response<TData>>
   ) => {
-    const { onSuccess, onError } = options;
+    const { onSuccess, onError, onMutate } = options;
 
     startTransition(async () => {
+      onMutate?.();
       const { response, error } = await tryCatch(mutationFn());
 
       if (error || !response?.success) {

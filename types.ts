@@ -25,6 +25,7 @@ export type CommentWithVotes = {
 export type MutationOptions<TData> = {
   onSuccess: (data: TData) => void;
   onError: (error: string) => void;
+  onMutate?: () => void;
 };
 
 export type MutationResult = {
