@@ -18,19 +18,18 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { tryCatch } from "@/hooks/try-catch";
 import { useDisclosure } from "@/hooks/use-disclosure";
+import { useMutation } from "@/hooks/use-mutation";
 import { addModeratorSchema, AddModeratorSchema } from "@/schema/subreddit";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 function AddModerator() {
   const { subreddit } = useParams<{ subreddit: string }>();
-  const [isPending, startTransition] = useTransition();
+  const { isPending, mutate } = useMutation();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const form = useForm<AddModeratorSchema>({
@@ -41,17 +40,15 @@ function AddModerator() {
   });
 
   const onSubmit = (data: AddModeratorSchema) => {
-    startTransition(async () => {
-      const { response, error } = await tryCatch(addModerator(data, subreddit));
-
-      if (error || !response?.success) {
-        toast.error(error?.message || response?.message);
-        return;
-      }
-
-      toast.success(response.message);
-      onClose();
-      form.reset();
+    mutate(() => addModerator(data, subreddit), {
+      onSuccess: (response) => {
+        toast.success(response.message);
+        onClose();
+        form.reset();
+      },
+      onError: (error) => {
+        toast.error(error);
+      },
     });
   };
 
@@ -83,7 +80,8 @@ function AddModerator() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full" disabled={isPending}>
+                {isPending && <Loader2 className="animate-spin" />}
                 Add Moderator
               </Button>
             </form>

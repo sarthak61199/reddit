@@ -29,13 +29,13 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { PLACEHOLDER_AVATAR_URL } from "@/constants";
 import { Subreddits } from "@/dal/subreddit";
-import { tryCatch } from "@/hooks/try-catch";
 import { useDisclosure } from "@/hooks/use-disclosure";
+import { useMutation } from "@/hooks/use-mutation";
 import { createPostSchema, CreatePostSchema } from "@/schema/post";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Plus } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { use, useEffect, useTransition } from "react";
+import { use, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -47,7 +47,7 @@ function CreatePost({
   const router = useRouter();
   const params = useParams();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [isPending, startTransition] = useTransition();
+  const { isPending, mutate } = useMutation();
 
   const subreddits = use(subredditsPromise);
 
@@ -68,20 +68,16 @@ function CreatePost({
   }, [params.subreddit]);
 
   const onSubmit = async (data: CreatePostSchema) => {
-    startTransition(async () => {
-      const { error, response } = await tryCatch(createPost(data));
-
-      if (error) {
-        toast.error(error.message);
-        return;
-      }
-
-      if (response?.success) {
+    mutate(() => createPost(data), {
+      onSuccess: (response) => {
         toast.success(response.message);
         onClose();
         form.reset();
         router.push(`/r/${response.data?.subreddit}/post/${response.data?.id}`);
-      }
+      },
+      onError: (error) => {
+        toast.error(error);
+      },
     });
   };
 

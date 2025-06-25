@@ -20,8 +20,8 @@ import {
 } from "@/components/ui/form";
 import InputIcon from "@/components/ui/input-icon";
 import { Textarea } from "@/components/ui/textarea";
-import { tryCatch } from "@/hooks/try-catch";
 import { useDisclosure } from "@/hooks/use-disclosure";
+import { useMutation } from "@/hooks/use-mutation";
 import {
   CreateSubredditSchema,
   createSubredditSchema,
@@ -29,12 +29,11 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 function CreateSubreddit() {
-  const [isPending, startTransition] = useTransition();
+  const { isPending, mutate } = useMutation();
   const { isOpen, onOpen, onToggle, onClose } = useDisclosure();
   const router = useRouter();
 
@@ -48,20 +47,16 @@ function CreateSubreddit() {
   });
 
   const onSubmit = (data: CreateSubredditSchema) => {
-    startTransition(async () => {
-      const { error, response } = await tryCatch(createSubreddit(data));
-
-      if (error) {
-        toast.error(error.message);
-        return;
-      }
-
-      if (response?.success) {
+    mutate(() => createSubreddit(data), {
+      onSuccess: (response) => {
         toast.success(response.message);
         onClose();
         form.reset();
         router.push(`/r/${response.data?.name}`);
-      }
+      },
+      onError: (error) => {
+        toast.error(error);
+      },
     });
   };
 

@@ -2,9 +2,9 @@
 
 import { joinOrLeaveSubreddit } from "@/actions/subreddit";
 import { Button } from "@/components/ui/button";
-import { tryCatch } from "@/hooks/try-catch";
+import { useMutation } from "@/hooks/use-mutation";
 import { UserMinus, UserPlus } from "lucide-react";
-import { useOptimistic, useTransition } from "react";
+import { useOptimistic } from "react";
 import { toast } from "sonner";
 
 function JoinSubreddit({
@@ -14,26 +14,24 @@ function JoinSubreddit({
   isMember: boolean;
   subredditName: string;
 }) {
-  const [_, startTransition] = useTransition();
+  const { mutate } = useMutation();
   const [optimisticIsMember, setOptimisticIsMember] = useOptimistic(
     isMember,
     (_, newState: boolean) => newState
   );
 
   const handleJoinToggle = () => {
-    startTransition(async () => {
-      setOptimisticIsMember(!optimisticIsMember);
-      const { error, response } = await tryCatch(
-        joinOrLeaveSubreddit(subredditName)
-      );
-
-      if (error || !response?.success) {
+    mutate(() => joinOrLeaveSubreddit(subredditName), {
+      onSuccess: (response) => {
+        toast.success(response.message);
+      },
+      onError: (error) => {
         setOptimisticIsMember(!optimisticIsMember);
-        toast.error(error?.message || response?.message);
-        return;
-      }
-
-      toast.success(response.message);
+        toast.error(error);
+      },
+      onMutate: () => {
+        setOptimisticIsMember(!optimisticIsMember);
+      },
     });
   };
 

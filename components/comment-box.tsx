@@ -10,11 +10,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { tryCatch } from "@/hooks/try-catch";
+import { useMutation } from "@/hooks/use-mutation";
 import { createCommentSchema, CreateCommentSchema } from "@/schema/comment";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
-import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -27,7 +26,7 @@ function CommentBox({
   parentId?: string;
   onSuccess?: () => void;
 }) {
-  const [isPending, startTransition] = useTransition();
+  const { isPending, mutate } = useMutation();
   const form = useForm<CreateCommentSchema>({
     defaultValues: {
       content: "",
@@ -36,19 +35,15 @@ function CommentBox({
   });
 
   const onSubmit = async (data: CreateCommentSchema) => {
-    startTransition(async () => {
-      const { error, response } = await tryCatch(
-        createComment(data, postId, parentId)
-      );
-
-      if (error || !response?.success) {
-        toast.error(error?.message || response?.message);
-        return;
-      }
-
-      toast.success(response.message);
-      form.reset();
-      onSuccess?.();
+    mutate(() => createComment(data, postId, parentId), {
+      onSuccess: (response) => {
+        toast.success(response.message);
+        form.reset();
+        onSuccess?.();
+      },
+      onError: (error) => {
+        toast.error(error);
+      },
     });
   };
 

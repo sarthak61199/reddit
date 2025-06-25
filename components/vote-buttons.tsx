@@ -3,11 +3,11 @@
 import { voteComment } from "@/actions/comment";
 import { votePost } from "@/actions/post";
 import { Button } from "@/components/ui/button";
-import { tryCatch } from "@/hooks/try-catch";
+import { useMutation } from "@/hooks/use-mutation";
 import { VoteType } from "@/lib/generated/prisma";
 import { Response } from "@/types";
 import { ArrowDown, ArrowUp } from "lucide-react";
-import { useOptimistic, useTransition } from "react";
+import { useOptimistic } from "react";
 import { toast } from "sonner";
 
 type VoteState = {
@@ -26,7 +26,7 @@ function VoteButtons({
   action: (voteType: VoteType | null) => Promise<Response>;
   disabled?: boolean;
 }) {
-  const [_, startTransition] = useTransition();
+  const { mutate } = useMutation();
 
   const [optimisticVoteState, addOptimisticVote] = useOptimistic(
     { userVote, voteCount },
@@ -60,17 +60,17 @@ function VoteButtons({
   );
 
   const handleVote = async (voteType: VoteType | null) => {
-    startTransition(async () => {
-      addOptimisticVote(voteType);
-      const { response, error } = await tryCatch(action(voteType));
-
-      if (error || !response?.success) {
+    mutate(() => action(voteType), {
+      onSuccess: (response) => {
+        toast.success(response.message);
+      },
+      onError: (error) => {
         addOptimisticVote(userVote);
-        toast.error(error?.message || response?.message);
-        return;
-      }
-
-      toast.success(response.message);
+        toast.error(error);
+      },
+      onMutate: () => {
+        addOptimisticVote(voteType);
+      },
     });
   };
 
