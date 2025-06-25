@@ -3,8 +3,6 @@ import Navbar from "@/components/navbar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { ReactNode } from "react";
 
-export const dynamic = "force-dynamic";
-
 function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="[--header-height:calc(--spacing(14))]">

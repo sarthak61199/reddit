@@ -11,7 +11,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { ComponentProps, Suspense } from "react";
+import { ComponentProps } from "react";
 
 export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
   return (
@@ -37,9 +37,7 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="flex flex-col gap-1">
-              <Suspense fallback={<div>Loading...</div>}>
-                <SubredditList />
-              </Suspense>
+              <SubredditList />
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
