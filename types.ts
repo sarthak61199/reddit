@@ -21,3 +21,16 @@ export type CommentWithVotes = {
   postId: string;
   replies?: CommentWithVotes[];
 };
+
+export type MutationOptions<TData> = {
+  onSuccess: (data: TData) => void;
+  onError: (error: string) => void;
+};
+
+export type MutationResult = {
+  mutate: <TData>(
+    mutationFn: () => Promise<Response<TData>>,
+    options: MutationOptions<Response<TData>>
+  ) => void;
+  isPending: boolean;
+};
