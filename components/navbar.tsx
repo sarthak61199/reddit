@@ -1,4 +1,5 @@
 import CreatePost from "@/components/create-post";
+import SearchBar from "@/components/search-bar";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -31,6 +32,7 @@ function Navbar({ isAuthPage = false }: { isAuthPage?: boolean }) {
             <Image src="/logo.svg" alt="logo" width={32} height={32} />
             <h1 className="text-2xl font-bold">Reddit.</h1>
           </Link>
+          {!isAuthPage && <SearchBar />}
           {!isAuthPage && (
             <div className="flex items-center gap-6">
               <CreatePost subredditsPromise={subreddits} />
