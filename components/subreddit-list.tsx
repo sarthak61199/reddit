@@ -41,8 +41,12 @@ function SubredditList() {
     <>
       {subreddits.map((item) => (
         <SidebarMenuItem key={item.name}>
-          <SidebarMenuButton asChild isActive={params?.subreddit === item.name}>
-            <Link href={`/r/${item.name}`} className="h-full font-bold">
+          <SidebarMenuButton
+            asChild
+            isActive={params?.subreddit === item.name}
+            className="h-full font-bold data-[active=true]:font-bold"
+          >
+            <Link href={`/r/${item.name}`}>
               <Avatar className="size-8">
                 <AvatarImage src={item.imageUrl || PLACEHOLDER_AVATAR_URL} />
               </Avatar>
