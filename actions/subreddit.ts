@@ -14,9 +14,9 @@ import { revalidatePath } from "next/cache";
 export const createSubreddit = async (
   input: CreateSubredditSchema
 ): Promise<Response<{ name: string }>> => {
-  try {
-    const user = await getUser();
+  const user = await getUser();
 
+  try {
     const v = createSubredditSchema.safeParse(input);
 
     if (!v.success) {

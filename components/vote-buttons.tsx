@@ -35,24 +35,19 @@ function VoteButtons({
       let newUserVote = newVoteType;
 
       if (!newVoteType) {
-        // User wants to remove their vote
         if (state.userVote) {
           voteCountChange = state.userVote === VoteType.UPVOTE ? -1 : 1;
           newUserVote = null;
         }
       } else {
-        // User wants to add or change their vote
         if (state.userVote) {
           if (state.userVote !== newVoteType) {
-            // Switching from upvote to downvote or vice versa
             voteCountChange = newVoteType === VoteType.UPVOTE ? 2 : -2;
           } else {
-            // Same vote type - this should remove the vote
             voteCountChange = state.userVote === VoteType.UPVOTE ? -1 : 1;
             newUserVote = null;
           }
         } else {
-          // New vote
           voteCountChange = newVoteType === VoteType.UPVOTE ? 1 : -1;
         }
       }

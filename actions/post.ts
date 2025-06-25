@@ -137,7 +137,7 @@ export const votePost = async (
       });
     }
 
-    revalidatePath(`/(main)/r/[subreddit]/post/[postId]`, "page");
+    revalidatePath(`/(main)/`, "layout");
 
     return {
       message: "Vote updated successfully",
