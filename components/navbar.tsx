@@ -9,7 +9,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 function Navbar({ isAuthPage = false }: { isAuthPage?: boolean }) {
-  const subreddits = getSubreddits();
+  const subreddits = isAuthPage ? Promise.resolve([]) : getSubreddits();
 
   return (
     <header className="bg-background sticky top-0 z-50 flex w-full items-center border-b">
