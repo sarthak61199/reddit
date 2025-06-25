@@ -19,7 +19,7 @@ function PostList({
 
   const [isLoading, setIsLoading] = useState(false);
   const [page, setPage] = useState(2);
-  const [posts, setPosts] = useState<GetPosts["posts"]>(initialPosts);
+  const [additionalPosts, setAdditionalPosts] = useState<GetPosts["posts"]>([]);
 
   const { ref, inView } = useInView();
 
@@ -32,7 +32,7 @@ function PostList({
       setIsLoading(true);
       const response = await fetch(URL);
       const data = (await response.json()) as GetPosts["posts"];
-      setPosts((prev) => [...prev, ...data]);
+      setAdditionalPosts((prev) => [...prev, ...data]);
       setPage((prev) => prev + 1);
     } catch {
       return;
@@ -46,6 +46,8 @@ function PostList({
       fetchPosts();
     }
   }, [inView, hasMore]);
+
+  const posts = [...initialPosts, ...additionalPosts];
 
   return (
     <div className="flex flex-col gap-4 items-center h-full ">
