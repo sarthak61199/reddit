@@ -34,6 +34,7 @@ import { useMutation } from "@/hooks/use-mutation";
 import { createPostSchema, CreatePostSchema } from "@/schema/post";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Plus } from "lucide-react";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { use, useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -65,7 +66,7 @@ function CreatePost({
     if (params.subreddit) {
       form.setValue("subreddit", params.subreddit as string);
     }
-  }, [params.subreddit]);
+  }, [params.subreddit, form]);
 
   const onSubmit = async (data: CreatePostSchema) => {
     mutate(() => createPost(data), {
@@ -125,7 +126,7 @@ function CreatePost({
                             key={subreddit.name}
                           >
                             <span className="flex items-center gap-2">
-                              <img
+                              <Image
                                 className="rounded-full"
                                 src={
                                   subreddit.imageUrl || PLACEHOLDER_AVATAR_URL

@@ -354,7 +354,7 @@ const SearchBar = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-sm">
-                      Search for "{query}"
+                      Search for &quot;{query}&quot;
                     </div>
                     <div className="text-xs text-muted-foreground">
                       Press Enter or click to search
@@ -369,7 +369,7 @@ const SearchBar = () => {
               results.subreddits.length === 0 &&
               results.accounts.length === 0 && (
                 <div className="p-4 text-center text-muted-foreground text-sm">
-                  No communities or people found for "{query}"
+                  No communities or people found for &quot;{query}&quot;
                 </div>
               )}
           </div>

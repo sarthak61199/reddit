@@ -3,9 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { useFileUpload } from "@/hooks/use-file-upload";
 import { AlertCircleIcon, ImageIcon, UploadIcon, XIcon } from "lucide-react";
+import Image from "next/image";
 
 const ImageUploader = ({
-  onChange,
   value,
 }: {
   onChange: (imageUrl: string) => void;
@@ -28,7 +28,7 @@ const ImageUploader = ({
   ] = useFileUpload({
     accept: "image/svg+xml,image/png,image/jpeg,image/jpg,image/gif",
     maxSize,
-    onFilesAdded: (files) => {
+    onFilesAdded: () => {
       // TODO: add image url to the database
     },
   });
@@ -53,7 +53,7 @@ const ImageUploader = ({
           />
           {previewUrl ? (
             <div className="absolute inset-0 flex items-center justify-center p-4">
-              <img
+              <Image
                 src={previewUrl}
                 alt={files[0]?.file?.name || "Post image"}
                 className="mx-auto max-h-full rounded object-contain"

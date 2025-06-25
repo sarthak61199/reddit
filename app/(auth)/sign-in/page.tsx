@@ -93,7 +93,7 @@ function Page() {
                 Sign In
               </Button>
               <p className="text-sm text-center text-muted-foreground">
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <Link href="/sign-up" className="hover:underline">
                   Sign Up
                 </Link>

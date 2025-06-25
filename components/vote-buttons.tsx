@@ -166,6 +166,7 @@ export function CommentVoteButtons({
       userVote={userVote}
       voteCount={voteCount}
       action={(voteType) => voteComment(commentId, voteType)}
+      disabled={disabled}
     />
   );
 }

@@ -45,6 +45,7 @@ function PostList({
     if (inView && hasMore) {
       fetchPosts();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inView, hasMore]);
 
   const posts = [...initialPosts, ...additionalPosts];
