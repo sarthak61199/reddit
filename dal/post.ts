@@ -13,6 +13,14 @@ export const getPosts = async (
 
   const where: Prisma.PostWhereInput = {};
 
+  where.subreddit = {
+    subredditMembers: {
+      some: {
+        userId: user.id,
+      },
+    },
+  };
+
   if (subreddit) {
     where.subreddit = {
       name: subreddit,
