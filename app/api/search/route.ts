@@ -1,14 +1,16 @@
-import { getSearchBarResults } from "@/dal/search";
+import { getSearchBarResults, SearchBarResults } from "@/dal/search";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
+
   const query = searchParams.get("query");
 
   if (!query) {
-    return Response.json({ error: "No query provided" }, { status: 400 });
+    return NextResponse.json({ error: "No query provided" }, { status: 400 });
   }
 
   const results = await getSearchBarResults(query);
 
-  return Response.json(results, { status: 200 });
+  return NextResponse.json<SearchBarResults>(results, { status: 200 });
 }
