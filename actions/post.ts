@@ -1,5 +1,6 @@
 "use server";
 
+import { getPosts } from "@/dal/post";
 import db from "@/lib/db";
 import { VoteType } from "@/lib/generated/prisma";
 import { getUser } from "@/lib/get-user";
@@ -150,4 +151,13 @@ export const votePost = async (
       success: false,
     };
   }
+};
+
+export const getPostsAction = async (
+  subreddit?: string,
+  username?: string,
+  page: number = 1,
+  limit: number = 10
+) => {
+  return await getPosts(subreddit, username, page, limit);
 };

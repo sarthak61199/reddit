@@ -4,10 +4,10 @@ import { getUser } from "@/lib/get-user";
 import { notFound } from "next/navigation";
 
 export const getPosts = async (
-  page: number = 1,
-  limit: number = 10,
   subreddit?: string,
-  username?: string
+  username?: string,
+  page: number = 1,
+  limit: number = 10
 ) => {
   const user = await getUser();
 

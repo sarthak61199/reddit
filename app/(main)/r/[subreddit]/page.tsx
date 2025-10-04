@@ -1,12 +1,39 @@
 import PostList from "@/components/post-list";
 import { getPosts } from "@/dal/post";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 
-async function Page({ params }: { params: Promise<{ subreddit: string }> }) {
+async function Page({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ subreddit: string }>;
+  searchParams: Promise<{ [key: string]: string | undefined }>;
+}) {
   const { subreddit } = await params;
+  const { page, limit } = await searchParams;
 
-  const posts = await getPosts(1, 10, subreddit);
+  const queryClient = new QueryClient();
 
-  return <PostList posts={posts.posts} hasMore={posts.hasMore} />;
+  await queryClient.prefetchQuery({
+    queryKey: ["posts", { subreddit, username: undefined }],
+    queryFn: () =>
+      getPosts(
+        subreddit,
+        undefined,
+        parseInt(page ?? "1"),
+        parseInt(limit ?? "10")
+      ),
+  });
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <PostList subreddit={subreddit} />
+    </HydrationBoundary>
+  );
 }
 
 export default Page;
